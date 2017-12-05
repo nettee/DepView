@@ -24,17 +24,11 @@ public class DepView {
     }
 
     public void view() {
-        List<File> javaFiles = new ArrayList<File>();
-        for (File sourcePath : sourcePaths) {
-            JavaFileFinder finder = JavaFileFinder.find(sourcePath, sourceFileExcludingRegex);
-            javaFiles.addAll(finder.getFiles());
-        }
+        ASTCreator astCreator = new ASTCreator(projectPath.getPath());
 
-        for (File file : javaFiles) {
-            System.out.println(file.getPath());
-            Ast ast = Ast.fromFile(file);
+        while (astCreator.hasNext()) {
+            Ast ast = astCreator.next();
             ast.visitWith(new InvocationVisitor());
-            return;
         }
 
         System.out.println("Done.");
