@@ -29,6 +29,7 @@ public class DepView {
         while (astCreator.hasNext()) {
             Ast ast = astCreator.next();
             ast.visitWith(new InvocationVisitor());
+            break;
         }
 
         System.out.println("Done.");

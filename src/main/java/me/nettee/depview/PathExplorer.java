@@ -39,9 +39,10 @@ class PathExplorer {
                     readDirectory(subdir.getPath());
                 }
             } else {
-                if (subdir.getName().endsWith(".java")) {
+                String fileName = subdir.getName();
+                if (fileName.endsWith(".java") && !fileName.contains("Test")) {
                     filePaths.add(subdir.getAbsolutePath());
-                } else if (subdir.getName().endsWith(".jar")) {
+                } else if (fileName.endsWith(".jar")) {
                     bins.add(subdir.getAbsolutePath());
                 }
             }
