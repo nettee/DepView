@@ -7,20 +7,26 @@ import java.util.List;
 public class DepView {
 
     private final File projectPath;
-    private final File[] sourcePaths;
 
-    public DepView(File projectPath, File[] sourcePaths) {
+    private File[] sourcePaths;
+    private String sourceFileExcludingRegex;
+
+    public DepView(File projectPath) {
         this.projectPath = projectPath;
+    }
+
+    public void setSourcePaths(File[] sourcePaths) {
         this.sourcePaths = sourcePaths;
     }
 
-    public void view() {
-        System.out.printf("Project path: %s\n", projectPath.getPath());
+    public void setSourceFileExcludingRegex(String sourceFileExcludingRegex) {
+        this.sourceFileExcludingRegex = sourceFileExcludingRegex;
+    }
 
+    public void view() {
         List<File> javaFiles = new ArrayList<File>();
         for (File sourcePath : sourcePaths) {
-            System.out.printf("Source path: %s\n", sourcePath.getPath());
-            JavaFileFinder finder = JavaFileFinder.find(projectPath);
+            JavaFileFinder finder = JavaFileFinder.find(sourcePath, sourceFileExcludingRegex);
             javaFiles.addAll(finder.getFiles());
         }
 
@@ -32,7 +38,9 @@ public class DepView {
     public static void main(String[] args) {
         File projectPath = new File("/home/william/projects/aql/aql-client");
         File sourcePath = new File(projectPath, "src");
-        DepView depView = new DepView(projectPath, new File[]{sourcePath});
+        DepView depView = new DepView(projectPath);
+        depView.setSourcePaths(new File[]{sourcePath});
+        depView.setSourceFileExcludingRegex("Test");
         depView.view();
     }
 }
