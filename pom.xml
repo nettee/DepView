@@ -15,6 +15,23 @@
   </properties>
 
   <dependencies>
+
+    <dependency>
+      <groupId>org.eclipse.core</groupId>
+      <artifactId>org.eclipse.core.runtime</artifactId>
+      <version>3.7.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.core</groupId>
+      <artifactId>org.eclipse.core.resources</artifactId>
+      <version>3.7.100</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.tycho</groupId>
+      <artifactId>org.eclipse.jdt.core</artifactId>
+      <version>3.8.0.v_C03</version>
+    </dependency>
+
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>

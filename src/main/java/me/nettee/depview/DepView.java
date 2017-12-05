@@ -32,6 +32,7 @@ public class DepView {
 
         for (File file : javaFiles) {
             System.out.printf("found: %s\n", file.getPath());
+            Ast.fromFile(file);
         }
     }
 
