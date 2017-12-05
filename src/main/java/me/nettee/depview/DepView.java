@@ -1,6 +1,8 @@
 package me.nettee.depview;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DepView {
 
@@ -14,8 +16,16 @@ public class DepView {
 
     public void view() {
         System.out.printf("Project path: %s\n", projectPath.getPath());
+
+        List<File> javaFiles = new ArrayList<File>();
         for (File sourcePath : sourcePaths) {
             System.out.printf("Source path: %s\n", sourcePath.getPath());
+            JavaFileFinder finder = JavaFileFinder.find(projectPath);
+            javaFiles.addAll(finder.getFiles());
+        }
+
+        for (File file : javaFiles) {
+            System.out.printf("found: %s\n", file.getPath());
         }
     }
 
