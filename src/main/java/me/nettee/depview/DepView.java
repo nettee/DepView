@@ -31,9 +31,13 @@ public class DepView {
         }
 
         for (File file : javaFiles) {
-            System.out.printf("found: %s\n", file.getPath());
-            Ast.fromFile(file);
+            System.out.println(file.getPath());
+            Ast ast = Ast.fromFile(file);
+            ast.visitWith(new InvocationVisitor());
+            return;
         }
+
+        System.out.println("Done.");
     }
 
     public static void main(String[] args) {

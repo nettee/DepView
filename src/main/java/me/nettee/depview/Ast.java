@@ -3,6 +3,7 @@ package me.nettee.depview;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
+import org.eclipse.jdt.core.dom.ASTVisitor;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -48,6 +49,10 @@ public class Ast {
         }
         in.close();
         return sb.toString();
+    }
+
+    public void visitWith(ASTVisitor visitor) {
+        root.accept(visitor);
     }
 
 }
