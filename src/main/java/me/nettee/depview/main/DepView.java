@@ -30,9 +30,10 @@ public class DepView {
 
         while (astCreator.hasNext()) {
             FileAst ast = astCreator.next();
+            ast.getClassDeclarations();
             InvocationVisitor visitor = new InvocationVisitor();
             ast.visitWith(visitor);
-            visitor.printInvocations();
+//            visitor.printInvocations();
         }
 
         System.out.println("Done.");
