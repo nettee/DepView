@@ -1,6 +1,7 @@
 package me.nettee.depview.main;
 
 import me.nettee.depview.ast.ASTCreator;
+import me.nettee.depview.ast.ClassAst;
 import me.nettee.depview.ast.FileAst;
 import me.nettee.depview.ast.InvocationVisitor;
 
@@ -29,11 +30,15 @@ public class DepView {
         ASTCreator astCreator = new ASTCreator(projectPath.getPath());
 
         while (astCreator.hasNext()) {
-            FileAst ast = astCreator.next();
-            ast.getClassDeclarations();
-            InvocationVisitor visitor = new InvocationVisitor();
-            ast.visitWith(visitor);
-//            visitor.printInvocations();
+            FileAst fileAst = astCreator.next();
+            Iterable<ClassAst> classAsts = fileAst.getClassDeclarations();
+            for (ClassAst classAst : classAsts) {
+                System.out.println("class: " + classAst.getClassName());
+                InvocationVisitor visitor = new InvocationVisitor();
+                fileAst.visitWith(visitor);
+                visitor.printInvocations();
+            }
+            System.out.println("------------------------------");
         }
 
         System.out.println("Done.");

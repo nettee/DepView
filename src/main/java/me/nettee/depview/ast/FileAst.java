@@ -11,8 +11,10 @@ public class FileAst extends Ast {
         super(root);
     }
 
-    public Iterable<Ast> getClassDeclarations() {
-        List<Ast> asts = new ArrayList<Ast>();
+    public Iterable<ClassAst> getClassDeclarations() {
+
+        List<ClassAst> asts = new ArrayList<ClassAst>();
+
         CompilationUnit compilationUnit = (CompilationUnit) root;
         PackageDeclaration packageDeclaration = compilationUnit.getPackage();
         String packageName = packageDeclaration.getName().getFullyQualifiedName();
@@ -20,9 +22,11 @@ public class FileAst extends Ast {
             TypeDeclaration typeDeclaration = (TypeDeclaration) o;
             String className = typeDeclaration.getName().getFullyQualifiedName();
             String qualifiedClassName = String.format("%s.%s", packageName, className);
-            System.out.println("className: " + qualifiedClassName);
+            ClassAst classAst = new ClassAst(typeDeclaration, qualifiedClassName);
+            asts.add(classAst);
         }
-        return null;
+
+        return asts;
     }
 
 }

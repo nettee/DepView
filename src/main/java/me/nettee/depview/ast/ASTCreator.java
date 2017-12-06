@@ -33,8 +33,6 @@ public class ASTCreator implements Iterator<FileAst> {
     public FileAst next() {
         String filepath = iter.next();
         ASTNode root = createAST(filepath);
-        System.out.println("---------------------------------");
-        System.out.printf("Create AST for file %s\n", filepath);
         return new FileAst(root);
     }
 
