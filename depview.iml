@@ -24,5 +24,19 @@
     <orderEntry type="library" name="Maven: org.eclipse.tycho:org.eclipse.jdt.core:3.8.0.v_C03" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: junit:junit:4.12" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.hamcrest:hamcrest-core:1.3" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.core:org.eclipse.core.runtime:3.7.0" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.osgi:org.eclipse.osgi:3.7.1" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.equinox:org.eclipse.equinox.common:3.6.0" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.core:org.eclipse.core.jobs:3.5.100" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.equinox:org.eclipse.equinox.registry:3.5.101" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.equinox:org.eclipse.equinox.preferences:3.4.1" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.core:org.eclipse.core.contenttype:3.4.100" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.equinox:org.eclipse.equinox.app:1.3.100" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.core:org.eclipse.core.resources:3.7.100" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.core:org.eclipse.core.expressions:3.4.300" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.core:org.eclipse.core.filesystem:1.3.100" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.tycho:org.eclipse.jdt.core:3.8.0.v_C03" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: junit:junit:4.12" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.hamcrest:hamcrest-core:1.3" level="project" />
   </component>
 </module>

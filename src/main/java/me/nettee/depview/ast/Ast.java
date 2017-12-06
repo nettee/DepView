@@ -1,18 +1,17 @@
-package me.nettee.depview;
+package me.nettee.depview.ast;
 
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 
 public class Ast {
 
-    private final ASTNode root;
+    protected final ASTNode root;
 
-    Ast(ASTNode root) {
+    public Ast(ASTNode root) {
         this.root = root;
     }
 
     public void visitWith(ASTVisitor visitor) {
         root.accept(visitor);
     }
-
 }

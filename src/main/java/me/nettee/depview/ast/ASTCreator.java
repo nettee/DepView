@@ -1,4 +1,4 @@
-package me.nettee.depview;
+package me.nettee.depview.ast;
 
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
-public class ASTCreator implements Iterator<Ast> {
+public class ASTCreator implements Iterator<FileAst> {
 
     private String[] classpathEntries;
     private String[] sourcepathEntries;
@@ -30,11 +30,11 @@ public class ASTCreator implements Iterator<Ast> {
         return iter.hasNext();
     }
 
-    public Ast next() {
+    public FileAst next() {
         String filepath = iter.next();
         ASTNode root = createAST(filepath);
         System.out.printf("Create AST for file %s\n", filepath);
-        return new Ast(root);
+        return new FileAst(root);
     }
 
     public void remove() {

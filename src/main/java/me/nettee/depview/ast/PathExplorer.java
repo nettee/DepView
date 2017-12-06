@@ -1,4 +1,4 @@
-package me.nettee.depview;
+package me.nettee.depview.ast;
 
 import java.io.File;
 import java.util.ArrayList;

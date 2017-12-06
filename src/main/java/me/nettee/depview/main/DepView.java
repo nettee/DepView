@@ -1,8 +1,10 @@
-package me.nettee.depview;
+package me.nettee.depview.main;
+
+import me.nettee.depview.ast.ASTCreator;
+import me.nettee.depview.ast.FileAst;
+import me.nettee.depview.ast.InvocationVisitor;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 public class DepView {
 
@@ -27,9 +29,10 @@ public class DepView {
         ASTCreator astCreator = new ASTCreator(projectPath.getPath());
 
         while (astCreator.hasNext()) {
-            Ast ast = astCreator.next();
-            ast.visitWith(new InvocationVisitor());
-            break;
+            FileAst ast = astCreator.next();
+            InvocationVisitor visitor = new InvocationVisitor();
+            ast.visitWith(visitor);
+            visitor.printInvocations();
         }
 
         System.out.println("Done.");
