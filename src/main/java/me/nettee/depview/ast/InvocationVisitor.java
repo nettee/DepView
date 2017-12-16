@@ -47,6 +47,8 @@ public class InvocationVisitor extends ASTVisitor {
                 String typeName = typeBinding.getQualifiedName();
                 Invocation invocation = new Invocation(expression.toString(), name.toString(), typeName);
                 addInvocation(invocation);
+            } else {
+                System.out.printf("\tno type binding for %s.%s()\n", expression.toString(), name.toString());
             }
         }
         return true;

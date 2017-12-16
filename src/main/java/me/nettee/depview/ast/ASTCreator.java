@@ -5,25 +5,46 @@ import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ASTCreator implements Iterator<FileAst> {
 
     private String[] classpathEntries;
     private String[] sourcepathEntries;
 
-    private List<String> filepaths;
-    private Iterator<String> iter;
+    private List<File> javaFiles;
+    private Iterator<File> iter;
 
-    public ASTCreator(String projectDirPath) {
-        PathExplorer explorer = PathExplorer.startExplore(projectDirPath);
-        classpathEntries = explorer.getClassPaths();
-        sourcepathEntries = explorer.getSourcePaths();
-        filepaths = explorer.getFilePaths();
-        iter = filepaths.iterator();
+    private String[] fileArrayToStringArray(File[] fileArray) {
+        return Arrays.stream(fileArray)
+                .map(file -> file.getPath())
+                .collect(Collectors.toList())
+                .toArray(new String[fileArray.length]);
+    }
+
+    public ASTCreator(File[] sourcePaths, File[] classPaths) {
+        sourcepathEntries = fileArrayToStringArray(sourcePaths);
+        classpathEntries = fileArrayToStringArray(classPaths);
+        System.out.println("sourcepath: " + String.join(", ", sourcepathEntries));
+        System.out.println("classpath: " + String.join(", ", classpathEntries));
+
+        javaFiles = new ArrayList<>();
+        for (File sourcePath : sourcePaths) {
+            JavaFileFinder finder = JavaFileFinder.find(sourcePath);
+            javaFiles.addAll(finder.getJavaFiles());
+        }
+        System.out.printf("Found %d java files:\n", javaFiles.size());
+        for (File filepath : javaFiles) {
+            System.out.println("\t" + filepath.getPath());
+        }
+        iter = javaFiles.iterator();
     }
 
     public boolean hasNext() {
@@ -31,8 +52,8 @@ public class ASTCreator implements Iterator<FileAst> {
     }
 
     public FileAst next() {
-        String filepath = iter.next();
-        ASTNode root = createAST(filepath);
+        File file = iter.next();
+        ASTNode root = createAST(file);
         return new FileAst(root);
     }
 
@@ -40,8 +61,9 @@ public class ASTCreator implements Iterator<FileAst> {
         throw new UnsupportedOperationException();
     }
 
-    private ASTNode createAST(String filepath) {
+    private ASTNode createAST(File file) {
 
+        String filepath = file.getPath();
         String program;
 
         try {

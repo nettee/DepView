@@ -6,28 +6,32 @@ import me.nettee.depview.ast.FileAst;
 import me.nettee.depview.ast.InvocationVisitor;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class DepView {
 
-    private final File projectPath;
-
     private File[] sourcePaths;
-    private String sourceFileExcludingRegex;
+    private File[] classPaths;
 
-    public DepView(File projectPath) {
-        this.projectPath = projectPath;
+    public DepView() {
     }
 
     public void setSourcePaths(File[] sourcePaths) {
         this.sourcePaths = sourcePaths;
     }
 
-    public void setSourceFileExcludingRegex(String sourceFileExcludingRegex) {
-        this.sourceFileExcludingRegex = sourceFileExcludingRegex;
+    public void setClassPaths(File[] classPaths) {
+        this.classPaths = classPaths;
     }
 
     public void view() {
-        ASTCreator astCreator = new ASTCreator(projectPath.getPath());
+        if (classPaths == null) {
+            throw new NullPointerException();
+        }
+
+        ASTCreator astCreator = new ASTCreator(sourcePaths, classPaths);
 
         while (astCreator.hasNext()) {
             FileAst fileAst = astCreator.next();
@@ -45,11 +49,12 @@ public class DepView {
     }
 
     public static void main(String[] args) {
-        File projectPath = new File("/home/william/projects/aql/aql-client");
-        File sourcePath = new File(projectPath, "src");
-        DepView depView = new DepView(projectPath);
+        File projectDir = new File("/home/william/projects/java/astcomparator");
+        File sourcePath = new File(projectDir, "src/main/java");
+        File classPath = new File(projectDir, "target/classes");
+        DepView depView = new DepView();
         depView.setSourcePaths(new File[]{sourcePath});
-        depView.setSourceFileExcludingRegex("Test");
+        depView.setClassPaths(new File[]{classPath});
         depView.view();
     }
 }
