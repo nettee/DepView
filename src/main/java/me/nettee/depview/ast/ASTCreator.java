@@ -39,9 +39,9 @@ public class ASTCreator implements Iterator<FileAst> {
             javaFiles.addAll(finder.getJavaFiles());
         }
         System.out.printf("Found %d java files:\n", javaFiles.size());
-        for (File filepath : javaFiles) {
-            System.out.println("\t" + filepath.getPath());
-        }
+//        for (File filepath : javaFiles) {
+//            System.out.println("\t" + filepath.getPath());
+//        }
         iter = javaFiles.iterator();
     }
 
