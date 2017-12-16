@@ -22,18 +22,16 @@ public class ASTCreator implements Iterator<FileAst> {
     private List<File> javaFiles;
     private Iterator<File> iter;
 
-    private String[] fileArrayToStringArray(File[] fileArray) {
-        return Arrays.stream(fileArray)
+    private String[] fileListToStringArray(List<File> fileList) {
+        return fileList.stream()
                 .map(file -> file.getPath())
                 .collect(Collectors.toList())
-                .toArray(new String[fileArray.length]);
+                .toArray(new String[fileList.size()]);
     }
 
-    public ASTCreator(File[] sourcePaths, File[] classPaths) {
-        sourcepathEntries = fileArrayToStringArray(sourcePaths);
-        classpathEntries = fileArrayToStringArray(classPaths);
-        System.out.println("sourcepath: " + String.join(", ", sourcepathEntries));
-        System.out.println("classpath: " + String.join(", ", classpathEntries));
+    public ASTCreator(List<File> sourcePaths, List<File> classPaths) {
+        sourcepathEntries = fileListToStringArray(sourcePaths);
+        classpathEntries = fileListToStringArray(classPaths);
 
         javaFiles = new ArrayList<>();
         for (File sourcePath : sourcePaths) {

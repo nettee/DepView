@@ -8,16 +8,15 @@ import me.nettee.depview.ast.FileAst;
 import me.nettee.depview.ast.InvocationVisitor;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.function.Function;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class DepView {
 
-    private File[] sourcePaths;
-    private File[] classPaths;
+    private List<File> sourcePaths;
+    private List<File> classPaths;
 
-    public DepView(File[] sourcePaths, File[] classPaths) {
+    public DepView(List<File> sourcePaths, List<File> classPaths) {
         this.sourcePaths = sourcePaths;
         this.classPaths = classPaths;
     }
@@ -58,10 +57,30 @@ public class DepView {
         Config path = testSubject.getConfig("path");
 
         File projectDir = new File(path.getString("base"));
-        File sourcePath = new File(projectDir, path.getString("source"));
-        File classPath = new File(projectDir, path.getString("classes"));
 
-        DepView depView = new DepView(new File[]{sourcePath}, new File[]{classPath});
+        List<File> sourcePaths = path.getStringList("sources").stream()
+                .map(pathName -> new File(projectDir, pathName))
+                .collect(Collectors.toList());
+        List<File> classPaths = path.getStringList("classes").stream()
+                .map(pathName -> new File(projectDir, pathName))
+                .collect(Collectors.toList());
+
+        System.out.println("sources: " + String.join(", ", sourcePaths.stream()
+                .map(file -> file.getPath())
+                .collect(Collectors.toList())));
+        System.out.println("classes: " + String.join(", ", classPaths.stream().
+                map(file -> file.getPath()).
+                collect(Collectors.toList())));
+
+//        if (testSubject.hasPath("dependency.jar")) {
+//            List<? extends Config> jarDependencies = testSubject.getConfigList("dependency.jar");
+//            for (Config jarDependency : jarDependencies) {
+//                String jarPath = jarDependency.getString("path");
+//                System.out.println("jar path: " + jarPath);
+//            }
+//        }
+
+        DepView depView = new DepView(sourcePaths, classPaths);
         depView.view();
     }
 }
