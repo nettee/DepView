@@ -1,5 +1,7 @@
 package me.nettee.depview.main;
 
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import me.nettee.depview.ast.ASTCreator;
 import me.nettee.depview.ast.ClassAst;
 import me.nettee.depview.ast.FileAst;
@@ -15,14 +17,8 @@ public class DepView {
     private File[] sourcePaths;
     private File[] classPaths;
 
-    public DepView() {
-    }
-
-    public void setSourcePaths(File[] sourcePaths) {
+    public DepView(File[] sourcePaths, File[] classPaths) {
         this.sourcePaths = sourcePaths;
-    }
-
-    public void setClassPaths(File[] classPaths) {
         this.classPaths = classPaths;
     }
 
@@ -49,12 +45,23 @@ public class DepView {
     }
 
     public static void main(String[] args) {
-        File projectDir = new File("/home/william/projects/java/astcomparator");
-        File sourcePath = new File(projectDir, "src/main/java");
-        File classPath = new File(projectDir, "target/classes");
-        DepView depView = new DepView();
-        depView.setSourcePaths(new File[]{sourcePath});
-        depView.setClassPaths(new File[]{classPath});
+
+//        String filename = "astcomparator.conf";
+        String filename = "aql-client.conf";
+
+        File testSubjectConfigFile = new File(filename);
+        Config conf = ConfigFactory.parseFile(testSubjectConfigFile);
+
+        Config testSubject = conf.getConfig("testSubject");
+        System.out.println("project name: " + testSubject.getString("name"));
+
+        Config path = testSubject.getConfig("path");
+
+        File projectDir = new File(path.getString("base"));
+        File sourcePath = new File(projectDir, path.getString("source"));
+        File classPath = new File(projectDir, path.getString("classes"));
+
+        DepView depView = new DepView(new File[]{sourcePath}, new File[]{classPath});
         depView.view();
     }
 }
