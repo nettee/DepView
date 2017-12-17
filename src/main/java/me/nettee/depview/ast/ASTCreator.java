@@ -64,7 +64,7 @@ public class ASTCreator implements Iterator<FileAst> {
 
     private ASTNode createAST(File file) {
 
-        String filepath = file.getPath();
+        String filepath = file.getAbsolutePath();
         String program;
 
         try {
@@ -73,13 +73,16 @@ public class ASTCreator implements Iterator<FileAst> {
             throw new IllegalStateException("Cannot read from file " + filepath);
         }
 
-        ASTParser parser = ASTParser.newParser(AST.JLS3);
+        ASTParser parser = ASTParser.newParser(AST.JLS4);
 
         parser.setSource(program.toCharArray());
         parser.setKind(ASTParser.K_COMPILATION_UNIT);
+//        parser.setEnvironment(classpathEntries, sourcepathEntries, null, true);
+//        parser.setEnvironment(null, null, null, true);
         parser.setEnvironment(classpathEntries, sourcepathEntries, null, true);
         parser.setUnitName(filepath);
         parser.setResolveBindings(true);
+        parser.setBindingsRecovery(true);
 
         return parser.createAST(null);
     }

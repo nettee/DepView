@@ -42,9 +42,9 @@ public class DepView {
         System.out.println("Jars:");
         jars.forEach(filePathPrinter);
 
-        classes.addAll(jars);
+//        classes.addAll(jars);
 
-        ASTCreator astCreator = new ASTCreator(sources, classes);
+        ASTCreator astCreator = new ASTCreator(sources, jars);
 
         while (astCreator.hasNext()) {
             FileAst fileAst = astCreator.next();
@@ -63,8 +63,8 @@ public class DepView {
 
     public static void main(String[] args) {
 
-        String filename = "astcomparator.conf";
-//        String filename = "aql-client.conf";
+//        String filename = "astcomparator.conf";
+        String filename = "aql-client.conf";
 
         File testSubjectConfigFile = new File(filename);
         TestSubject testSubject = parseConf(testSubjectConfigFile);

@@ -11,24 +11,22 @@ import java.util.stream.Collectors;
 
 public class InvocationVisitor extends ASTVisitor {
 
-    private Map<String, Set<Invocation>> invocationsMap = new HashMap<String, Set<Invocation>>();
+    private Map<String, Set<Invocation>> invocationsMap = new HashMap<>();
 
     private void addInvocation(Invocation invocation) {
         String key = invocation.getQualifiedType();
         if (!invocationsMap.containsKey(key)) {
-            invocationsMap.put(key, new HashSet<Invocation>());
+            invocationsMap.put(key, new HashSet<>());
         }
         Set<Invocation> invocations = invocationsMap.get(key);
         invocations.add(invocation);
     }
 
     public void printInvocations() {
-        invocationsMap.forEach((typeName, invocations) -> {
-            System.out.printf("\t%s: {%s}\n", typeName,
-                    String.join(", ", invocations.stream().
-                            map(invocation -> invocation.getInvocationString()).
-                            collect(Collectors.toList())));
-        });
+        invocationsMap.forEach((typeName, invocations) -> System.out.printf("\t%s: {%s}\n", typeName,
+                String.join(", ", invocations.stream().
+                        map(invocation -> invocation.getInvocationString()).
+                        collect(Collectors.toList()))));
     }
 
     @Override
@@ -40,6 +38,15 @@ public class InvocationVisitor extends ASTVisitor {
 //                ITypeBinding binding = name.resolveTypeBinding();
 //                if (binding != null) {
 //                    System.out.printf("Type binding of identifier %s: %s\n", name, binding.getQualifiedName());
+//                }
+//            }
+//            {
+//                IMethodBinding binding = node.resolveMethodBinding();
+//                if (binding != null) {
+//                    System.out.printf("Method binding of invocation %s.%s(): %s\n",
+//                            expression.toString(),
+//                            name.toString(),
+//                            binding.getName());
 //                }
 //            }
             ITypeBinding typeBinding = expression.resolveTypeBinding();

@@ -22,7 +22,7 @@
     <orderEntry type="library" name="Maven: org.eclipse.core:org.eclipse.core.resources:3.7.100" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.core:org.eclipse.core.expressions:3.4.300" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.core:org.eclipse.core.filesystem:1.3.100" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.tycho:org.eclipse.jdt.core:3.8.0.v_C03" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.tycho:org.eclipse.jdt.core:3.12.2.v20161117-1814" level="project" />
     <orderEntry type="library" name="Maven: com.google.guava:guava:23.5-jre" level="project" />
     <orderEntry type="library" name="Maven: com.google.code.findbugs:jsr305:1.3.9" level="project" />
     <orderEntry type="library" name="Maven: org.checkerframework:checker-qual:2.0.0" level="project" />

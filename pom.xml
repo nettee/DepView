@@ -31,7 +31,7 @@
     <dependency>
       <groupId>org.eclipse.tycho</groupId>
       <artifactId>org.eclipse.jdt.core</artifactId>
-      <version>3.8.0.v_C03</version>
+      <version>3.12.2.v20161117-1814</version>
     </dependency>
 
     <dependency>
