@@ -2,6 +2,8 @@ package me.nettee.depview.main;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.graph.MutableNetwork;
+import com.google.common.graph.NetworkBuilder;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import me.nettee.depview.ast.ASTCreator;
@@ -46,7 +48,10 @@ public class DepView {
 
         ASTCreator astCreator = new ASTCreator(sources, jars);
 
-        Map<String, Map<String, Set<Invocation>>> invocationsMapMap = new HashMap<>();
+        MutableNetwork<String, Invocation> depGraph = NetworkBuilder.directed()
+                .allowsParallelEdges(true)
+                .allowsSelfLoops(true)
+                .build();
 
         while (astCreator.hasNext()) {
             FileAst fileAst = astCreator.next();
@@ -58,17 +63,35 @@ public class DepView {
                 classAst.visitWith(visitor);
 
                 Map<String, Set<Invocation>> invocationsMap = visitor.getInvocationsMap();
-                invocationsMapMap.put(className, invocationsMap);
+                depGraph.addNode(className);
+                invocationsMap.forEach((typeName, invocations) -> {
+                    depGraph.addNode(typeName);
+                    invocations.forEach(invocation -> {
+                        depGraph.addEdge(className, typeName, invocation);
+                    });
+                });
             }
         }
 
-        invocationsMapMap.forEach((className, invocationsMap) -> {
-            System.out.println("class: " + className);
-            invocationsMap.forEach((typeName, invocations) -> System.out.printf("\t%s: {%s}\n", typeName,
-                    String.join(", ", invocations.stream().
-                            map(invocation -> invocation.getInvocationString()).
-                            collect(Collectors.toList())))
-            );
+        System.out.println("all classnames:");
+        Set<String> classNames = depGraph.nodes();
+        classNames.forEach(className -> System.out.println("\t" + className));
+
+        System.out.println("all dependencies:");
+        classNames.forEach(className1 -> {
+            classNames.forEach(className2 -> {
+                Set<Invocation> invocations = depGraph.edgesConnecting(className1, className2);
+                if (invocations.isEmpty()) {
+                    return;
+                }
+                System.out.printf("\t%s -> %s\t\t\t(%d) {%s}\n",
+                        className1,
+                        className2,
+                        invocations.size(),
+                        String.join(", ", invocations.stream()
+                                .map(invocation -> invocation.getInvocationString())
+                                .collect(Collectors.toList())));
+            });
         });
 
         System.out.println("Done.");
