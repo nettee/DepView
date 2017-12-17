@@ -1,17 +1,18 @@
 package me.nettee.depview.ast;
 
+import me.nettee.depview.model.PlainClass;
 import org.eclipse.jdt.core.dom.ASTNode;
 
 public class ClassAst extends Ast {
 
-    private final String className;
+    private final PlainClass class_;
 
-    public ClassAst(ASTNode root, String className) {
+    public ClassAst(ASTNode root, PlainClass class_) {
         super(root);
-        this.className = className;
+        this.class_ = class_;
     }
 
-    public String getClassName() {
-        return className;
+    public PlainClass getPlainClass() {
+        return class_;
     }
 }

@@ -1,5 +1,6 @@
 package me.nettee.depview.ast;
 
+import me.nettee.depview.model.PlainClass;
 import org.eclipse.jdt.core.dom.*;
 
 import java.util.ArrayList;
@@ -22,10 +23,11 @@ public class FileAst extends Ast {
 
         for (Object o : compilationUnit.types()) {
             TypeDeclaration typeDeclaration = (TypeDeclaration) o;
+
             String className = typeDeclaration.getName().getFullyQualifiedName();
             String qualifiedClassName = String.format("%s.%s", packageName, className);
 
-            ClassAst classAst = new ClassAst(typeDeclaration, qualifiedClassName);
+            ClassAst classAst = new ClassAst(typeDeclaration, new PlainClass(qualifiedClassName));
             asts.add(classAst);
         }
 

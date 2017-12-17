@@ -1,6 +1,7 @@
 package me.nettee.depview.ast;
 
 import me.nettee.depview.model.Invocation;
+import me.nettee.depview.model.PlainClass;
 import org.eclipse.jdt.core.dom.*;
 
 import java.util.HashMap;
@@ -11,16 +12,16 @@ import java.util.stream.Collectors;
 
 public class InvocationVisitor extends ASTVisitor {
 
-    private final String className;
+    private final PlainClass class_;
 
-    private Map<String, Set<Invocation>> invocationsMap = new HashMap<>();
+    private Map<PlainClass, Set<Invocation>> invocationsMap = new HashMap<>();
 
-    public InvocationVisitor(String className) {
-        this.className = className;
+    public InvocationVisitor(PlainClass className) {
+        this.class_ = className;
     }
 
     private void addInvocation(Invocation invocation) {
-        String key = invocation.getQualifiedType();
+        PlainClass key = invocation.getType();
         if (!invocationsMap.containsKey(key)) {
             invocationsMap.put(key, new HashSet<>());
         }
@@ -43,17 +44,18 @@ public class InvocationVisitor extends ASTVisitor {
             ITypeBinding typeBinding = expression.resolveTypeBinding();
             if (typeBinding != null) {
                 String typeName = typeBinding.getQualifiedName();
-                Invocation invocation = new Invocation(expression.toString(), name.toString(), typeName);
+                PlainClass type = new PlainClass(typeName);
+                Invocation invocation = new Invocation(expression.toString(), name.toString(), type);
                 addInvocation(invocation);
             } else {
                 System.out.printf("Warning: no type binding for %s.%s() - in class %s\n",
-                        expression.toString(), name.toString(), className);
+                        expression.toString(), name.toString(), class_.getName());
             }
         }
         return true;
     }
 
-    public Map<String, Set<Invocation>> getInvocationsMap() {
+    public Map<PlainClass, Set<Invocation>> getInvocationsMap() {
         return invocationsMap;
     }
 }

@@ -4,16 +4,16 @@ public class Invocation {
 
     private final String expression;
     private final String invocationName;
-    private final String qualifiedType;
+    private final PlainClass type;
 
-    public Invocation(String expression, String invocationName, String qualifiedType) {
+    public Invocation(String expression, String invocationName, PlainClass type) {
         this.expression = expression;
         this.invocationName = invocationName;
-        this.qualifiedType = qualifiedType;
+        this.type = type;
     }
 
-    public String getQualifiedType() {
-        return qualifiedType;
+    public PlainClass getType() {
+        return type;
     }
 
     public String getInvocationString() {
@@ -22,6 +22,6 @@ public class Invocation {
 
     @Override
     public String toString() {
-        return String.format("%s.%s(), type = %s", expression, invocationName, qualifiedType);
+        return String.format("%s.%s(), type = %s", expression, invocationName, type);
     }
 }

@@ -3,6 +3,7 @@ package me.nettee.depview.main;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.graph.MutableNetwork;
+import com.google.common.graph.Network;
 import com.google.common.graph.NetworkBuilder;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
@@ -11,6 +12,7 @@ import me.nettee.depview.ast.ClassAst;
 import me.nettee.depview.ast.FileAst;
 import me.nettee.depview.ast.InvocationVisitor;
 import me.nettee.depview.model.Invocation;
+import me.nettee.depview.model.PlainClass;
 import me.nettee.depview.model.TestSubject;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -25,6 +27,29 @@ public class DepView {
 
     public DepView(TestSubject testSubject) {
         this.testSubject = testSubject;
+    }
+
+    private void showDependencies(Network<PlainClass, Invocation> depGraph) {
+
+        System.out.println("all classes:");
+        Set<PlainClass> classes = depGraph.nodes();
+        classes.forEach(c -> System.out.println("\t" + c));
+
+        System.out.println("all dependencies:");
+        classes.forEach(inClass -> {
+            classes.forEach(outClass -> {
+                Set<Invocation> invocations = depGraph.edgesConnecting(inClass, outClass);
+                if (!invocations.isEmpty()) {
+                    System.out.printf("\t%s -> %s\t\t\t(%d) {%s}\n",
+                            inClass.getName(),
+                            outClass.getName(),
+                            invocations.size(),
+                            String.join(", ", invocations.stream()
+                                    .map(invocation -> invocation.getInvocationString())
+                                    .collect(Collectors.toList())));
+                }
+            });
+        });
     }
 
     public void view() {
@@ -48,7 +73,7 @@ public class DepView {
 
         ASTCreator astCreator = new ASTCreator(sources, jars);
 
-        MutableNetwork<String, Invocation> depGraph = NetworkBuilder.directed()
+        MutableNetwork<PlainClass, Invocation> depGraph = NetworkBuilder.directed()
                 .allowsParallelEdges(true)
                 .allowsSelfLoops(true)
                 .build();
@@ -58,41 +83,22 @@ public class DepView {
             Iterable<ClassAst> classAsts = fileAst.getClassAsts();
 
             for (ClassAst classAst : classAsts) {
-                String className = classAst.getClassName();
-                InvocationVisitor visitor = new InvocationVisitor(className);
+                PlainClass inClass = classAst.getPlainClass();
+                InvocationVisitor visitor = new InvocationVisitor(inClass);
                 classAst.visitWith(visitor);
 
-                Map<String, Set<Invocation>> invocationsMap = visitor.getInvocationsMap();
-                depGraph.addNode(className);
-                invocationsMap.forEach((typeName, invocations) -> {
-                    depGraph.addNode(typeName);
+                Map<PlainClass, Set<Invocation>> invocationsMap = visitor.getInvocationsMap();
+                depGraph.addNode(inClass);
+                invocationsMap.forEach((outClass, invocations) -> {
+                    depGraph.addNode(outClass);
                     invocations.forEach(invocation -> {
-                        depGraph.addEdge(className, typeName, invocation);
+                        depGraph.addEdge(inClass, outClass, invocation);
                     });
                 });
             }
         }
 
-        System.out.println("all classnames:");
-        Set<String> classNames = depGraph.nodes();
-        classNames.forEach(className -> System.out.println("\t" + className));
-
-        System.out.println("all dependencies:");
-        classNames.forEach(className1 -> {
-            classNames.forEach(className2 -> {
-                Set<Invocation> invocations = depGraph.edgesConnecting(className1, className2);
-                if (invocations.isEmpty()) {
-                    return;
-                }
-                System.out.printf("\t%s -> %s\t\t\t(%d) {%s}\n",
-                        className1,
-                        className2,
-                        invocations.size(),
-                        String.join(", ", invocations.stream()
-                                .map(invocation -> invocation.getInvocationString())
-                                .collect(Collectors.toList())));
-            });
-        });
+        showDependencies(depGraph);
 
         System.out.println("Done.");
     }
