@@ -11,9 +11,7 @@ import me.nettee.depview.ast.ASTCreator;
 import me.nettee.depview.ast.ClassAst;
 import me.nettee.depview.ast.FileAst;
 import me.nettee.depview.ast.InvocationVisitor;
-import me.nettee.depview.model.Invocation;
-import me.nettee.depview.model.PlainClass;
-import me.nettee.depview.model.TestSubject;
+import me.nettee.depview.model.*;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.File;
@@ -27,29 +25,6 @@ public class DepView {
 
     public DepView(TestSubject testSubject) {
         this.testSubject = testSubject;
-    }
-
-    private void showDependencies(Network<PlainClass, Invocation> depGraph) {
-
-        System.out.println("all classes:");
-        Set<PlainClass> classes = depGraph.nodes();
-        classes.forEach(c -> System.out.println("\t" + c));
-
-        System.out.println("all dependencies:");
-        classes.forEach(inClass -> {
-            classes.forEach(outClass -> {
-                Set<Invocation> invocations = depGraph.edgesConnecting(inClass, outClass);
-                if (!invocations.isEmpty()) {
-                    System.out.printf("\t%s -> %s\t\t\t(%d) {%s}\n",
-                            inClass.getName(),
-                            outClass.getName(),
-                            invocations.size(),
-                            String.join(", ", invocations.stream()
-                                    .map(invocation -> invocation.getInvocationString())
-                                    .collect(Collectors.toList())));
-                }
-            });
-        });
     }
 
     public void view() {
@@ -73,32 +48,24 @@ public class DepView {
 
         ASTCreator astCreator = new ASTCreator(sources, jars);
 
-        MutableNetwork<PlainClass, Invocation> depGraph = NetworkBuilder.directed()
-                .allowsParallelEdges(true)
-                .allowsSelfLoops(true)
-                .build();
+        DepGraph depGraph = new DepGraph();
 
         while (astCreator.hasNext()) {
             FileAst fileAst = astCreator.next();
             Iterable<ClassAst> classAsts = fileAst.getClassAsts();
 
             for (ClassAst classAst : classAsts) {
-                PlainClass inClass = classAst.getPlainClass();
-                InvocationVisitor visitor = new InvocationVisitor(inClass);
+                InvocationVisitor visitor = new InvocationVisitor(classAst.getPlainClass());
                 classAst.visitWith(visitor);
 
-                Map<PlainClass, Set<Invocation>> invocationsMap = visitor.getInvocationsMap();
-                depGraph.addNode(inClass);
-                invocationsMap.forEach((outClass, invocations) -> {
-                    depGraph.addNode(outClass);
-                    invocations.forEach(invocation -> {
-                        depGraph.addEdge(inClass, outClass, invocation);
-                    });
+                List<InvDep> invDeps = visitor.getInvDeps();
+                invDeps.forEach(invDep -> {
+                    depGraph.addDep(invDep);
                 });
             }
         }
 
-        showDependencies(depGraph);
+        depGraph.showDependencies();
 
         System.out.println("Done.");
     }

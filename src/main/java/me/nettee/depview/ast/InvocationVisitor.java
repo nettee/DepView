@@ -1,39 +1,20 @@
 package me.nettee.depview.ast;
 
+import me.nettee.depview.model.InvDep;
 import me.nettee.depview.model.Invocation;
 import me.nettee.depview.model.PlainClass;
 import org.eclipse.jdt.core.dom.*;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.*;
 
 public class InvocationVisitor extends ASTVisitor {
 
-    private final PlainClass class_;
+    private final PlainClass thisClass;
 
-    private Map<PlainClass, Set<Invocation>> invocationsMap = new HashMap<>();
+    private List<InvDep> invDeps = new ArrayList<>();
 
     public InvocationVisitor(PlainClass className) {
-        this.class_ = className;
-    }
-
-    private void addInvocation(Invocation invocation) {
-        PlainClass key = invocation.getType();
-        if (!invocationsMap.containsKey(key)) {
-            invocationsMap.put(key, new HashSet<>());
-        }
-        Set<Invocation> invocations = invocationsMap.get(key);
-        invocations.add(invocation);
-    }
-
-    public void printInvocations() {
-        invocationsMap.forEach((typeName, invocations) -> System.out.printf("\t%s: {%s}\n", typeName,
-                String.join(", ", invocations.stream().
-                        map(invocation -> invocation.getInvocationString()).
-                        collect(Collectors.toList()))));
+        this.thisClass = className;
     }
 
     @Override
@@ -44,18 +25,19 @@ public class InvocationVisitor extends ASTVisitor {
             ITypeBinding typeBinding = expression.resolveTypeBinding();
             if (typeBinding != null) {
                 String typeName = typeBinding.getQualifiedName();
-                PlainClass type = new PlainClass(typeName);
-                Invocation invocation = new Invocation(expression.toString(), name.toString(), type);
-                addInvocation(invocation);
+                PlainClass targetClass = new PlainClass(typeName);
+                Invocation invocation = new Invocation(expression.toString(), name.toString(), targetClass);
+                InvDep invDep = new InvDep(thisClass, targetClass, invocation);
+                invDeps.add(invDep);
             } else {
                 System.out.printf("Warning: no type binding for %s.%s() - in class %s\n",
-                        expression.toString(), name.toString(), class_.getName());
+                        expression.toString(), name.toString(), thisClass.getName());
             }
         }
         return true;
     }
 
-    public Map<PlainClass, Set<Invocation>> getInvocationsMap() {
-        return invocationsMap;
+    public List<InvDep> getInvDeps() {
+        return invDeps;
     }
 }
