@@ -24,7 +24,7 @@ public class ASTCreator implements Iterator<FileAst> {
 
     private String[] fileListToStringArray(List<File> fileList) {
         return fileList.stream()
-                .map(file -> file.getPath())
+                .map(file -> file.getAbsolutePath())
                 .collect(Collectors.toList())
                 .toArray(new String[fileList.size()]);
     }
@@ -33,15 +33,18 @@ public class ASTCreator implements Iterator<FileAst> {
         sourcepathEntries = fileListToStringArray(sourcePaths);
         classpathEntries = fileListToStringArray(classPaths);
 
+        System.out.println("classpath entries:");
+        classPaths.forEach(path -> System.out.println("\t" + path));
+
         javaFiles = new ArrayList<>();
         for (File sourcePath : sourcePaths) {
             JavaFileFinder finder = JavaFileFinder.find(sourcePath);
             javaFiles.addAll(finder.getJavaFiles());
         }
         System.out.printf("Found %d java files:\n", javaFiles.size());
-//        for (File filepath : javaFiles) {
-//            System.out.println("\t" + filepath.getPath());
-//        }
+        for (File filepath : javaFiles) {
+            System.out.println("\t" + filepath.getPath());
+        }
         iter = javaFiles.iterator();
     }
 

@@ -5,6 +5,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import me.nettee.depview.ast.ASTCreator;
+import me.nettee.depview.ast.ClassAst;
+import me.nettee.depview.ast.FileAst;
+import me.nettee.depview.ast.InvocationVisitor;
 import me.nettee.depview.model.JarsFinder;
 import me.nettee.depview.model.TestSubject;
 import org.apache.commons.lang3.tuple.Pair;
@@ -39,19 +42,21 @@ public class DepView {
         System.out.println("Jars:");
         jars.forEach(filePathPrinter);
 
+        classes.addAll(jars);
+
         ASTCreator astCreator = new ASTCreator(sources, classes);
 
-//        while (astCreator.hasNext()) {
-//            FileAst fileAst = astCreator.next();
-//            Iterable<ClassAst> classAsts = fileAst.getClassDeclarations();
-//            for (ClassAst classAst : classAsts) {
-//                System.out.println("class: " + classAst.getClassName());
-//                InvocationVisitor visitor = new InvocationVisitor();
-//                fileAst.visitWith(visitor);
-//                visitor.printInvocations();
-//            }
-//            System.out.println("------------------------------");
-//        }
+        while (astCreator.hasNext()) {
+            FileAst fileAst = astCreator.next();
+            Iterable<ClassAst> classAsts = fileAst.getClassDeclarations();
+            for (ClassAst classAst : classAsts) {
+                System.out.println("class: " + classAst.getClassName());
+                InvocationVisitor visitor = new InvocationVisitor();
+                fileAst.visitWith(visitor);
+                visitor.printInvocations();
+            }
+            System.out.println("------------------------------");
+        }
 
         System.out.println("Done.");
     }
@@ -97,6 +102,22 @@ public class DepView {
                 System.out.println("jar path: " + jar.getPath());
             }
             testSubject.addJars(jars);
+        }
+
+        if (config.hasPath("dependency.jdk")) {
+            Config jdkDependency = config.getConfig("dependency.jdk");
+            File jdkHome = new File(jdkDependency.getString("home"));
+
+            List<String> jarDependencies = jdkDependency.getStringList("jar");
+            Pair<Map<String, File>, Set<String>> result = JarsFinder.find(jdkHome, jarDependencies);
+            Map<String, File> jarsFound = result.getLeft();
+            Set<String> jarsNotFound = result.getRight();
+
+            if (!jarsNotFound.isEmpty()) {
+                System.out.print("Warning: jars not found: ");
+                jarsNotFound.forEach(fileName -> System.out.println("\t" + fileName));
+            }
+            testSubject.addJars(jarsFound.values());
         }
 
         if (config.hasPath("dependency.maven")) {

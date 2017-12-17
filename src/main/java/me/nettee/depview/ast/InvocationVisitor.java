@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class InvocationVisitor extends ASTVisitor {
 
@@ -22,19 +23,12 @@ public class InvocationVisitor extends ASTVisitor {
     }
 
     public void printInvocations() {
-        for (Map.Entry<String, Set<Invocation>> entry : invocationsMap.entrySet()) {
-            String typeName = entry.getKey();
-            Set<Invocation> invocations = entry.getValue();
-            StringBuilder sb = new StringBuilder();
-            sb.append(typeName);
-            sb.append(": {");
-            for (Invocation invocation : invocations) {
-                sb.append(invocation.getInvocationString());
-                sb.append(", ");
-            }
-            sb.append("}");
-            System.out.println("    " + sb.toString());
-        }
+        invocationsMap.forEach((typeName, invocations) -> {
+            System.out.printf("\t%s: {%s}\n", typeName,
+                    String.join(", ", invocations.stream().
+                            map(invocation -> invocation.getInvocationString()).
+                            collect(Collectors.toList())));
+        });
     }
 
     @Override
@@ -42,6 +36,12 @@ public class InvocationVisitor extends ASTVisitor {
         Expression expression = node.getExpression();
         SimpleName name = node.getName();
         if (expression != null) {
+//            {
+//                ITypeBinding binding = name.resolveTypeBinding();
+//                if (binding != null) {
+//                    System.out.printf("Type binding of identifier %s: %s\n", name, binding.getQualifiedName());
+//                }
+//            }
             ITypeBinding typeBinding = expression.resolveTypeBinding();
             if (typeBinding != null) {
                 String typeName = typeBinding.getQualifiedName();
