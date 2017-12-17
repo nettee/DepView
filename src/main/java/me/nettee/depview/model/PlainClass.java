@@ -8,6 +8,24 @@ public class PlainClass implements Comparable<PlainClass> {
         this.qualifiedName = qualifiedName;
     }
 
+    public boolean isInPackage(String package_) {
+        return qualifiedName.startsWith(package_);
+    }
+
+    public String getSimpleName() {
+        int i = qualifiedName.lastIndexOf('.');
+        if (i == -1) {
+            return qualifiedName;
+        } else {
+            return qualifiedName.substring(i + 1);
+        }
+    }
+
+    public String getShortName(String package_) {
+        int n = package_.length();
+        return qualifiedName.substring(n);
+    }
+
     public String getName() {
         return qualifiedName;
     }

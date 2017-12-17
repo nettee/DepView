@@ -1,4 +1,4 @@
-package me.nettee.depview.main;
+package me.nettee.depview.model;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;

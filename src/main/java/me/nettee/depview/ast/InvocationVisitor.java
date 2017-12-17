@@ -10,11 +10,13 @@ import java.util.*;
 public class InvocationVisitor extends ASTVisitor {
 
     private final PlainClass thisClass;
+    private final String package_;
 
     private List<InvDep> invDeps = new ArrayList<>();
 
-    public InvocationVisitor(PlainClass className) {
+    public InvocationVisitor(PlainClass className, String package_) {
         this.thisClass = className;
+        this.package_  = package_;
     }
 
     @Override
@@ -31,7 +33,7 @@ public class InvocationVisitor extends ASTVisitor {
                 invDeps.add(invDep);
             } else {
                 System.out.printf("Warning: no type binding for %s.%s() - in class %s\n",
-                        expression.toString(), name.toString(), thisClass.getName());
+                        expression.toString(), name.toString(), thisClass.getShortName(package_));
             }
         }
         return true;
