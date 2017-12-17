@@ -1,4 +1,4 @@
-package me.nettee.depview.ast;
+package me.nettee.depview.model;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -15,7 +15,6 @@ public class JarsFinder {
         jarToFind = new HashSet<>();
         jarFound = new HashMap<>();
         jars.forEach(jar -> jarToFind.add(jar));
-        System.out.println("Jar to find: \n\t" + String.join("\n\t", jarToFind));
         explore(baseDir);
     }
 
