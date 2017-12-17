@@ -3,10 +3,14 @@ package me.nettee.depview.main;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import me.nettee.depview.ast.ASTCreator;
+import me.nettee.depview.ast.JarsFinder;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class DepView {
@@ -93,9 +97,13 @@ public class DepView {
             File repository = new File(mavenDependency.getString("repository"));
             System.out.println("repository: " + repository);
             List<String> jarDependencies = mavenDependency.getStringList("jar");
-            for (String jar : jarDependencies) {
-                System.out.println("maven jar path: " + jar);
-            }
+            Pair<Map<String, File>, Set<String>> result = JarsFinder.find(repository, jarDependencies);
+            Map<String, File> jarsFound = result.getLeft();
+            Set<String> jarsNotFound = result.getRight();
+            System.out.println("Jars found:");
+            jarsFound.forEach((fileName, file) -> System.out.println("\t" + file.getAbsolutePath()));
+            System.out.println("Jars not found:");
+            jarsNotFound.forEach(fileName -> System.out.println("\t" + fileName));
         }
 
         depView.view();
