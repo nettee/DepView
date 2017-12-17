@@ -11,7 +11,13 @@ import java.util.stream.Collectors;
 
 public class InvocationVisitor extends ASTVisitor {
 
+    private final String className;
+
     private Map<String, Set<Invocation>> invocationsMap = new HashMap<>();
+
+    public InvocationVisitor(String className) {
+        this.className = className;
+    }
 
     private void addInvocation(Invocation invocation) {
         String key = invocation.getQualifiedType();
@@ -34,30 +40,20 @@ public class InvocationVisitor extends ASTVisitor {
         Expression expression = node.getExpression();
         SimpleName name = node.getName();
         if (expression != null) {
-//            {
-//                ITypeBinding binding = name.resolveTypeBinding();
-//                if (binding != null) {
-//                    System.out.printf("Type binding of identifier %s: %s\n", name, binding.getQualifiedName());
-//                }
-//            }
-//            {
-//                IMethodBinding binding = node.resolveMethodBinding();
-//                if (binding != null) {
-//                    System.out.printf("Method binding of invocation %s.%s(): %s\n",
-//                            expression.toString(),
-//                            name.toString(),
-//                            binding.getName());
-//                }
-//            }
             ITypeBinding typeBinding = expression.resolveTypeBinding();
             if (typeBinding != null) {
                 String typeName = typeBinding.getQualifiedName();
                 Invocation invocation = new Invocation(expression.toString(), name.toString(), typeName);
                 addInvocation(invocation);
             } else {
-                System.out.printf("\tno type binding for %s.%s()\n", expression.toString(), name.toString());
+                System.out.printf("Warning: no type binding for %s.%s() - in class %s\n",
+                        expression.toString(), name.toString(), className);
             }
         }
         return true;
+    }
+
+    public Map<String, Set<Invocation>> getInvocationsMap() {
+        return invocationsMap;
     }
 }

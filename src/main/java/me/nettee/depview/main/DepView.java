@@ -8,7 +8,7 @@ import me.nettee.depview.ast.ASTCreator;
 import me.nettee.depview.ast.ClassAst;
 import me.nettee.depview.ast.FileAst;
 import me.nettee.depview.ast.InvocationVisitor;
-import me.nettee.depview.model.JarsFinder;
+import me.nettee.depview.model.Invocation;
 import me.nettee.depview.model.TestSubject;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -46,17 +46,30 @@ public class DepView {
 
         ASTCreator astCreator = new ASTCreator(sources, jars);
 
+        Map<String, Map<String, Set<Invocation>>> invocationsMapMap = new HashMap<>();
+
         while (astCreator.hasNext()) {
             FileAst fileAst = astCreator.next();
-            Iterable<ClassAst> classAsts = fileAst.getClassDeclarations();
+            Iterable<ClassAst> classAsts = fileAst.getClassAsts();
+
             for (ClassAst classAst : classAsts) {
-                System.out.println("class: " + classAst.getClassName());
-                InvocationVisitor visitor = new InvocationVisitor();
-                fileAst.visitWith(visitor);
-                visitor.printInvocations();
+                String className = classAst.getClassName();
+                InvocationVisitor visitor = new InvocationVisitor(className);
+                classAst.visitWith(visitor);
+
+                Map<String, Set<Invocation>> invocationsMap = visitor.getInvocationsMap();
+                invocationsMapMap.put(className, invocationsMap);
             }
-            System.out.println("------------------------------");
         }
+
+        invocationsMapMap.forEach((className, invocationsMap) -> {
+            System.out.println("class: " + className);
+            invocationsMap.forEach((typeName, invocations) -> System.out.printf("\t%s: {%s}\n", typeName,
+                    String.join(", ", invocations.stream().
+                            map(invocation -> invocation.getInvocationString()).
+                            collect(Collectors.toList())))
+            );
+        });
 
         System.out.println("Done.");
     }
@@ -98,9 +111,6 @@ public class DepView {
             List<File> jars = config.getStringList("dependency.jar").stream()
                     .map(jarDependency -> new File(projectDir, jarDependency))
                     .collect(Collectors.toList());
-            for (File jar : jars) {
-                System.out.println("jar path: " + jar.getPath());
-            }
             testSubject.addJars(jars);
         }
 

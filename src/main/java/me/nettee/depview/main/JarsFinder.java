@@ -1,4 +1,4 @@
-package me.nettee.depview.model;
+package me.nettee.depview.main;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -6,7 +6,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import java.io.File;
 import java.util.*;
 
-public class JarsFinder {
+class JarsFinder {
 
     private Set<String> jarToFind;
     private Map<String, File> jarFound;

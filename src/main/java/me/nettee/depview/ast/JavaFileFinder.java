@@ -1,10 +1,10 @@
-package me.nettee.depview.model;
+package me.nettee.depview.ast;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class JavaFileFinder {
+class JavaFileFinder {
 
     private List<File> javaFiles = new ArrayList<>();
 

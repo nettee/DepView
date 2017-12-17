@@ -1,6 +1,5 @@
 package me.nettee.depview.ast;
 
-import me.nettee.depview.model.JavaFileFinder;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
