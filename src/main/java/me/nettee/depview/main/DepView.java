@@ -10,10 +10,12 @@ import me.nettee.depview.ast.ClassAst;
 import me.nettee.depview.ast.FileAst;
 import me.nettee.depview.ast.InvocationVisitor;
 import me.nettee.depview.model.*;
+import org.apache.commons.lang3.StringUtils;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.function.Consumer;
 
@@ -75,7 +77,27 @@ public class DepView {
         Gson gson = new Gson();
         String json = gson.toJson(graph);
 
-        try (PrintWriter writer = new PrintWriter("output/example/graph.json")) {
+        File output = new File("output");
+        if (!output.exists()) {
+            output.mkdir();
+        }
+
+        String safeName = StringUtils.replaceAll(testSubject.getName(), "[ \\s/\\\\~`?*^&$#@%]", " ");
+        File outputDir = new File(output, safeName);
+        if (!outputDir.exists()) {
+            outputDir.mkdir();
+        }
+
+        InputStream inputStream = getClass().getResourceAsStream("/index.html");
+        File indexFile = new File(outputDir, "index.html");
+        try {
+            Files.copy(inputStream, indexFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        File dataFile = new File(outputDir, "graph.json");
+        try (PrintWriter writer = new PrintWriter(dataFile)) {
             writer.println(json);
             writer.close();
         } catch (FileNotFoundException e) {

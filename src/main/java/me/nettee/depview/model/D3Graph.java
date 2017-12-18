@@ -59,9 +59,10 @@ public class D3Graph {
         classes.forEach(inClass -> {
             classes.forEach(outClass -> {
                 Set<Invocation> invocations = depGraph.edgesConnecting(inClass, outClass);
-                int factor = inClass.isSamePackageWith(outClass) ? 3 : 1;
-                int count = invocations.size() > 3 ? invocations.size() : 0;
-                int value = factor * count;
+//                int factor = inClass.isSamePackageWith(outClass) ? 3 : 1;
+//                int count = invocations.size() > 3 ? invocations.size() : 0;
+//                int value = factor * count;
+                int value = invocations.size();
                 Link link = new Link(inClass.getName(), outClass.getName(), value);
                 links.add(link);
             });
