@@ -1,3 +1,6 @@
+# My files
+output/
+
 # Maven files
 target/
 pom.xml.tag

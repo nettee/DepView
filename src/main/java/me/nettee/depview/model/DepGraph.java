@@ -2,8 +2,11 @@ package me.nettee.depview.model;
 
 import com.google.common.graph.MutableNetwork;
 import com.google.common.graph.NetworkBuilder;
+import com.google.gson.Gson;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -35,7 +38,7 @@ public class DepGraph {
         depGraph.addEdge(inClass, outClass, invocation);
     }
 
-    public void showDependencies() {
+    public void printDependencies() {
 
         Set<PlainClass> classes = depGraph.nodes();
         System.out.printf("All %d classes:\n", classes.size());
@@ -72,4 +75,9 @@ public class DepGraph {
             return s + StringUtils.repeat(' ', len - s.length());
         }
     }
+
+    public MutableNetwork<PlainClass, Invocation> getGraph() {
+        return depGraph;
+    }
 }
+

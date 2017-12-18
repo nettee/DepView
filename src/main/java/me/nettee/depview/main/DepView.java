@@ -2,6 +2,7 @@ package me.nettee.depview.main;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.gson.Gson;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import me.nettee.depview.ast.ASTCreator;
@@ -11,6 +12,8 @@ import me.nettee.depview.ast.InvocationVisitor;
 import me.nettee.depview.model.*;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.*;
 import java.util.function.Consumer;
 
@@ -65,7 +68,19 @@ public class DepView {
             }
         }
 
-        depGraph.showDependencies();
+        depGraph.printDependencies();
+
+        D3Graph graph = D3Graph.fromDepGraph(depGraph);
+
+        Gson gson = new Gson();
+        String json = gson.toJson(graph);
+
+        try (PrintWriter writer = new PrintWriter("output/example/graph.json")) {
+            writer.println(json);
+            writer.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
 
         System.out.println("Done.");
     }
