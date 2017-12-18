@@ -25,7 +25,6 @@ def depview(args):
     print(' '.join(cmd))
     call(cmd)
 
-
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()

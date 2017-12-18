@@ -6,8 +6,16 @@ Build and package project:
 mvn package
 ```
 
-Run DepView
+Run DepView:
 
 ```Shell
-bin/depview CONF
+bin/depview <CONF>
 ```
+
+View result:
+
+```Shell
+bin/serve output/<NAME>
+```
+
+Open [localhost:8000](localhost:8000)
