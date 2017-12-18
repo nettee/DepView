@@ -2,21 +2,16 @@ package me.nettee.depview.model;
 
 import com.google.common.graph.MutableNetwork;
 import com.google.common.graph.NetworkBuilder;
-import com.google.gson.Gson;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 public class DepGraph {
 
-    private final String package_;
     private final MutableNetwork<PlainClass, Invocation> depGraph;
 
-    public DepGraph(String package_) {
-        this.package_ = package_;
+    public DepGraph() {
         depGraph = NetworkBuilder.directed()
                 .allowsParallelEdges(true)
                 .allowsSelfLoops(true)
@@ -27,7 +22,7 @@ public class DepGraph {
         PlainClass inClass = invDep.getThisClass();
         PlainClass outClass = invDep.getTargetClass();
 
-        if (!outClass.isInPackage(package_)) {
+        if (!outClass.isInPackage()) {
             return;
         }
 
@@ -43,10 +38,10 @@ public class DepGraph {
         Set<PlainClass> classes = depGraph.nodes();
         System.out.printf("All %d classes:\n", classes.size());
         classes.forEach(class_ -> {
-            if (!class_.isInPackage(package_)) {
+            if (!class_.isInPackage()) {
                 return;
             }
-            System.out.println("\t" + class_.getShortName(package_));
+            System.out.println("\t" + class_.getShortName());
         });
 
         Set<Invocation> dependencies = depGraph.edges();
@@ -58,8 +53,8 @@ public class DepGraph {
                     return;
                 }
                 System.out.printf("\t%s -> %s\t(%d) {%s}\n",
-                        padTo(inClass.getShortName(package_), 32),
-                        padTo(outClass.getShortName(package_), 34),
+                        padTo(inClass.getShortName(), 32),
+                        padTo(outClass.getShortName(), 34),
                         invocations.size(),
                         String.join(", ", invocations.stream()
                                 .map(invocation -> invocation.getInvocationString())

@@ -8,8 +8,11 @@ import java.util.List;
 
 public class FileAst extends Ast {
 
-    FileAst(ASTNode root) {
+    private final String projectPackage;
+
+    FileAst(ASTNode root, String projectPackage) {
         super(root);
+        this.projectPackage = projectPackage;
     }
 
     public Iterable<ClassAst> getClassAsts() {
@@ -27,7 +30,8 @@ public class FileAst extends Ast {
             String className = typeDeclaration.getName().getFullyQualifiedName();
             String qualifiedClassName = String.format("%s.%s", packageName, className);
 
-            ClassAst classAst = new ClassAst(typeDeclaration, new PlainClass(qualifiedClassName));
+            PlainClass class_ = new PlainClass(qualifiedClassName, projectPackage);
+            ClassAst classAst = new ClassAst(typeDeclaration, class_);
             asts.add(classAst);
         }
 

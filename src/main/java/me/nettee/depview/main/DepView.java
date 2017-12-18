@@ -28,8 +28,8 @@ public class DepView {
     public void view() {
 
         System.out.println("Test subject: " + testSubject.getName());
-        String package_ = testSubject.getPackage();
-        System.out.println("Package name: " + package_);
+        String projectPackage = testSubject.getProjectPackage();
+        System.out.println("Package name: " + projectPackage);
 
         List<File> sources = testSubject.getSources();
         List<File> classes = testSubject.getClasses();
@@ -48,16 +48,16 @@ public class DepView {
 
 //        classes.addAll(jars);
 
-        ASTCreator astCreator = new ASTCreator(sources, jars);
+        ASTCreator astCreator = new ASTCreator(sources, jars, projectPackage);
 
-        DepGraph depGraph = new DepGraph(package_);
+        DepGraph depGraph = new DepGraph();
 
         while (astCreator.hasNext()) {
             FileAst fileAst = astCreator.next();
             Iterable<ClassAst> classAsts = fileAst.getClassAsts();
 
             for (ClassAst classAst : classAsts) {
-                InvocationVisitor visitor = new InvocationVisitor(classAst.getPlainClass(), package_);
+                InvocationVisitor visitor = new InvocationVisitor(classAst.getPlainClass());
 
                 classAst.visitWith(visitor);
 
@@ -87,8 +87,10 @@ public class DepView {
 
     public static void main(String[] args) {
 
-//        String filename = "astcomparator.conf";
-        String filename = "aql-client.conf";
+        if (args.length < 1) {
+            throw new IllegalArgumentException();
+        }
+        String filename = args[0];
 
         File testSubjectConfigFile = new File(filename);
 

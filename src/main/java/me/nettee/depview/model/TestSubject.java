@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 public class TestSubject {
 
     private String name;
-    private String package_;
+    private String projectPackage;
     private List<File> sources;
     private List<File> classes;
     private final List<File> jars;
@@ -23,7 +23,7 @@ public class TestSubject {
 
         TestSubject testSubject = new TestSubject();
         testSubject.setName(config.getString("name"));
-        testSubject.setPackage(config.getString("package"));
+        testSubject.setProjectPackage(config.getString("package"));
 
         Config path = config.getConfig("path");
         File projectDir = new File(path.getString("base"));
@@ -92,12 +92,12 @@ public class TestSubject {
         this.name = name;
     }
 
-    public String getPackage() {
-        return package_;
+    public String getProjectPackage() {
+        return projectPackage;
     }
 
-    public void setPackage(String package_) {
-        this.package_ = package_;
+    public void setProjectPackage(String projectPackage) {
+        this.projectPackage = projectPackage;
     }
 
     public List<File> getSources() {

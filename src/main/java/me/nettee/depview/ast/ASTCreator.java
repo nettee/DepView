@@ -15,8 +15,9 @@ import java.util.stream.Collectors;
 
 public class ASTCreator implements Iterator<FileAst> {
 
-    private String[] classpathEntries;
-    private String[] sourcepathEntries;
+    private final String[] classpathEntries;
+    private final String[] sourcepathEntries;
+    private final String projectPackage;
 
     private List<File> javaFiles;
     private Iterator<File> iter;
@@ -28,9 +29,10 @@ public class ASTCreator implements Iterator<FileAst> {
                 .toArray(new String[fileList.size()]);
     }
 
-    public ASTCreator(List<File> sourcePaths, List<File> classPaths) {
+    public ASTCreator(List<File> sourcePaths, List<File> classPaths, String projectPackage) {
         sourcepathEntries = fileListToStringArray(sourcePaths);
         classpathEntries = fileListToStringArray(classPaths);
+        this.projectPackage = projectPackage;
 
         System.out.println("classpath entries:");
         classPaths.forEach(path -> System.out.println("\t" + path));
@@ -54,7 +56,7 @@ public class ASTCreator implements Iterator<FileAst> {
     public FileAst next() {
         File file = iter.next();
         ASTNode root = createAST(file);
-        return new FileAst(root);
+        return new FileAst(root, projectPackage);
     }
 
     public void remove() {

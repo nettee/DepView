@@ -2,9 +2,7 @@ package me.nettee.depview.model;
 
 import com.google.common.graph.MutableNetwork;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class D3Graph {
 
@@ -36,15 +34,35 @@ public class D3Graph {
     private D3Graph(MutableNetwork<PlainClass, Invocation> depGraph) {
 
         Set<PlainClass> classes = depGraph.nodes();
+
+        Set<String> packages = new HashSet<>();
         classes.forEach(class_ -> {
-            Node node = new Node(class_.getName(), 0);
+            String package_ = class_.getPackage();
+            packages.add(package_);
+        });
+
+        Map<String, Integer> packageGroups = new HashMap<>();
+        {
+            int group = 0;
+            for (String package_ : packages) {
+                packageGroups.put(package_, group);
+                group++;
+            }
+        }
+
+        classes.forEach(class_ -> {
+            int group = packageGroups.get(class_.getPackage());
+            Node node = new Node(class_.getName(), group);
             nodes.add(node);
         });
 
         classes.forEach(inClass -> {
             classes.forEach(outClass -> {
                 Set<Invocation> invocations = depGraph.edgesConnecting(inClass, outClass);
-                Link link = new Link(inClass.getName(), outClass.getName(), invocations.size());
+                int factor = inClass.isSamePackageWith(outClass) ? 3 : 1;
+                int count = invocations.size() > 3 ? invocations.size() : 0;
+                int value = factor * count;
+                Link link = new Link(inClass.getName(), outClass.getName(), value);
                 links.add(link);
             });
         });
