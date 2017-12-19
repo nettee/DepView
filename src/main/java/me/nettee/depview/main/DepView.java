@@ -88,12 +88,14 @@ public class DepView {
             outputDir.mkdir();
         }
 
-        InputStream inputStream = getClass().getResourceAsStream("/index.html");
-        File indexFile = new File(outputDir, "index.html");
-        try {
-            Files.copy(inputStream, indexFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-        } catch (IOException e) {
-            e.printStackTrace();
+        for (String fileToCopy : new String[] {"index.html", "d3.v4.min.js"}) {
+            InputStream inputStream = getClass().getResourceAsStream("/" + fileToCopy);
+            File indexFile = new File(outputDir, fileToCopy);
+            try {
+                Files.copy(inputStream, indexFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
         File dataFile = new File(outputDir, "graph.json");
