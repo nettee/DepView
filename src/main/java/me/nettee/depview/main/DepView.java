@@ -1,23 +1,26 @@
 package me.nettee.depview.main;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import me.nettee.depview.ast.ASTCreator;
 import me.nettee.depview.ast.ClassAst;
 import me.nettee.depview.ast.FileAst;
 import me.nettee.depview.ast.InvocationVisitor;
-import me.nettee.depview.model.*;
+import me.nettee.depview.model.D3Graph;
+import me.nettee.depview.model.DepGraph;
+import me.nettee.depview.model.InvDep;
+import me.nettee.depview.model.TestSubject;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.*;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.util.*;
+import java.util.List;
 import java.util.function.Consumer;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public class DepView {
 
@@ -74,7 +77,7 @@ public class DepView {
 
         D3Graph graph = D3Graph.fromDepGraph(depGraph);
 
-        Gson gson = new Gson();
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
         String json = gson.toJson(graph);
 
         File output = new File("output");
@@ -82,7 +85,7 @@ public class DepView {
             output.mkdir();
         }
 
-        String safeName = StringUtils.replaceAll(testSubject.getName(), "[ \\s/\\\\~`?*^&$#@%]", " ");
+        String safeName = StringUtils.replaceAll(testSubject.getName(), "[ \\s/\\\\~`?*^&$#@%]", "-");
         File outputDir = new File(output, safeName);
         if (!outputDir.exists()) {
             outputDir.mkdir();

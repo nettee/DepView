@@ -63,8 +63,10 @@ public class D3Graph {
 //                int count = invocations.size() > 3 ? invocations.size() : 0;
 //                int value = factor * count;
                 int value = invocations.size();
-                Link link = new Link(inClass.getName(), outClass.getName(), value);
-                links.add(link);
+                if (value > 0) {
+                    Link link = new Link(inClass.getName(), outClass.getName(), value);
+                    links.add(link);
+                }
             });
         });
     }
