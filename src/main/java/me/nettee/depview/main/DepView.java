@@ -34,7 +34,6 @@ public class DepView {
 
         System.out.println("Test subject: " + testSubject.getName());
         String projectPackage = testSubject.getProjectPackage();
-        System.out.println("Package name: " + projectPackage);
 
         List<File> sources = testSubject.getSources();
         List<File> classes = testSubject.getClasses();
@@ -74,6 +73,12 @@ public class DepView {
         }
 
         depGraph.printDependencies();
+        printD3Js(depGraph);
+
+        System.out.println("Done.");
+    }
+
+    private void printD3Js(DepGraph depGraph) {
 
         D3Graph graph = D3Graph.fromDepGraph(depGraph);
 
@@ -109,7 +114,8 @@ public class DepView {
             e.printStackTrace();
         }
 
-        System.out.println("Done.");
+        System.out.printf("Dependencies dumped to %s.\n", dataFile.getPath());
+        System.out.printf("Run `%s %s' to view dependencies graph.\n", "bin/serve", outputDir.getPath());
     }
 
     public static void main(String[] args) {
