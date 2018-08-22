@@ -2,6 +2,8 @@
 
 Analyze calling dependencies in Java projects, and visualize them in a dependency graph.
 
+Related article: [Depview: Java 程序调用依赖关系的分析与显示](http://nettee.github.io/posts/2018/Depview-View-invocation-relationships-in-Java-projects/)
+
 ![Dependency graph](img/depgraph.png)
 
 ## Quickstart
