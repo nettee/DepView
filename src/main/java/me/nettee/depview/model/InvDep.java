@@ -1,6 +1,6 @@
 package me.nettee.depview.model;
 
-public class InvDep {
+public class InvDep implements Dependency {
 
     private final PlainClass thisClass;
     private final PlainClass targetClass;

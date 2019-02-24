@@ -6,7 +6,7 @@ import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import me.nettee.depview.ast.ASTCreator;
 import me.nettee.depview.ast.FileAst;
-import me.nettee.depview.ast.InvocationVisitor;
+import me.nettee.depview.ast.ClassAstVisitor;
 import me.nettee.depview.model.D3Graph;
 import me.nettee.depview.model.DepGraph;
 import me.nettee.depview.model.InvDep;
@@ -35,7 +35,6 @@ public class DepView {
     public void view() {
 
         System.out.println("Test subject: " + testSubject.getName());
-        String projectPackage = testSubject.getProjectPackage();
 
         List<Path> sources = testSubject.getSources();
         List<Path> classes = testSubject.getClasses();
@@ -58,21 +57,22 @@ public class DepView {
         // We only need to pass sources and jars to ASTCreator.
         // JDT takes jars as classpath entries.
 
-        ASTCreator astCreator = new ASTCreator(sources, jars, projectPackage);
+        Env env = Env.newInstance(testSubject);
+
+        ASTCreator astCreator = new ASTCreator(env, sources, jars);
 
         List<InvDep> invocationDependencies = astCreator.stream()
                 .map(FileAst::getClassAsts)
                 .flatMap(Collection::stream)
                 .map(classAst -> {
-                    System.out.println("Class AST: " + classAst.getPlainClass().toString());
-                    InvocationVisitor visitor = new InvocationVisitor(classAst.getPlainClass());
+                    ClassAstVisitor visitor = new ClassAstVisitor(env, classAst.getPlainClass());
                     classAst.visitWith(visitor);
                     return visitor.getInvDeps();
                 })
                 .flatMap(Collection::stream)
                 .collect(Collectors.toList());
 
-        DepGraph depGraph = new DepGraph(invocationDependencies);
+        DepGraph depGraph = new DepGraph(env, invocationDependencies);
         depGraph.printDependencies();
         printD3Js(depGraph);
 

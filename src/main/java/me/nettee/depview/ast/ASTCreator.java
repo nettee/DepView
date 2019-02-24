@@ -1,6 +1,7 @@
 package me.nettee.depview.ast;
 
 import com.google.common.collect.Streams;
+import me.nettee.depview.main.Env;
 import me.nettee.depview.main.Settings;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -19,7 +20,7 @@ public class ASTCreator {
 
     private final String[] classpathEntries;
     private final String[] sourcepathEntries;
-    private final String projectPackage;
+    private final Env env;
 
     private List<Path> javaFiles;
     private Iterator<Path> iter;
@@ -32,10 +33,10 @@ public class ASTCreator {
                 .toArray(new String[pathList.size()]);
     }
 
-    public ASTCreator(List<Path> sourcePaths, List<Path> classPaths, String projectPackage) {
+    public ASTCreator(Env env, List<Path> sourcePaths, List<Path> classPaths) {
+        this.env = env;
         this.sourcepathEntries = pathListToStringArray(sourcePaths);
         this.classpathEntries = pathListToStringArray(classPaths);
-        this.projectPackage = projectPackage;
 
         if (Settings.verbose) {
             System.out.println("classpath entries:");
@@ -69,7 +70,7 @@ public class ASTCreator {
             public FileAst next() {
                 Path path = iter.next();
                 ASTNode root = createAST(path);
-                return new FileAst(root, projectPackage);
+                return new FileAst(env, root);
             }
         };
     }

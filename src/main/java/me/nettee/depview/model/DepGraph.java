@@ -2,6 +2,7 @@ package me.nettee.depview.model;
 
 import com.google.common.graph.MutableNetwork;
 import com.google.common.graph.NetworkBuilder;
+import me.nettee.depview.main.Env;
 import me.nettee.depview.main.Settings;
 import org.apache.commons.lang3.StringUtils;
 
@@ -11,18 +12,20 @@ import java.util.stream.Collectors;
 
 public class DepGraph {
 
+    private final Env env;
     private final MutableNetwork<PlainClass, Invocation> depGraph;
     private int allDepCount = 0;
 
-    public DepGraph() {
-        depGraph = NetworkBuilder.directed()
+    public DepGraph(Env env) {
+        this.env = env;
+        this.depGraph = NetworkBuilder.directed()
                 .allowsParallelEdges(true)
                 .allowsSelfLoops(true)
                 .build();
     }
 
-    public DepGraph(List<InvDep> depList) {
-        this();
+    public DepGraph(Env env, List<InvDep> depList) {
+        this(env);
         depList.forEach(this::addDep);
     }
 
@@ -32,11 +35,11 @@ public class DepGraph {
 
         allDepCount++;
 
-        if (!inClass.isInPackage()) {
+        if (!inClass.isInPackage(env.getProjectPackage())) {
             return;
         }
 
-        if (!outClass.isInPackage()) {
+        if (!outClass.isInPackage(env.getProjectPackage())) {
             return;
         }
 
@@ -55,10 +58,10 @@ public class DepGraph {
         if (Settings.verbose) {
             System.out.printf("All %d classes:\n", classes.size());
             classes.forEach(class_ -> {
-                if (!class_.isInPackage()) {
+                if (!class_.isInPackage(env.getProjectPackage())) {
                     return;
                 }
-                System.out.println("\t" + class_.getShortName());
+                System.out.println("\t" + class_.getShortName(env));
             });
             System.out.printf("All %d dependencies:\n", dependencies.size());
             classes.forEach(inClass -> {
@@ -68,8 +71,8 @@ public class DepGraph {
                         return;
                     }
                     System.out.printf("\t%s -> %s\t(%d) {%s}\n",
-                            padTo(inClass.getShortName(), 32),
-                            padTo(outClass.getShortName(), 34),
+                            padTo(inClass.getShortName(env), 32),
+                            padTo(outClass.getShortName(env), 34),
                             invocations.size(),
                             String.join(", ", invocations.stream()
                                     .map(invocation -> invocation.getInvocationString())

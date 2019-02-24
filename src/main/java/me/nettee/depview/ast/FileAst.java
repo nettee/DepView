@@ -1,5 +1,6 @@
 package me.nettee.depview.ast;
 
+import me.nettee.depview.main.Env;
 import me.nettee.depview.model.PlainClass;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.CompilationUnit;
@@ -11,11 +12,11 @@ import java.util.List;
 
 public class FileAst extends Ast {
 
-    private final String projectPackage;
+    private final Env env;
 
-    FileAst(ASTNode root, String projectPackage) {
+    FileAst(Env env, ASTNode root) {
         super(root);
-        this.projectPackage = projectPackage;
+        this.env = env;
     }
 
     public List<ClassAst> getClassAsts() {
@@ -33,7 +34,7 @@ public class FileAst extends Ast {
             String className = typeDeclaration.getName().getFullyQualifiedName();
             String qualifiedClassName = String.format("%s.%s", packageName, className);
 
-            PlainClass class_ = new PlainClass(qualifiedClassName, projectPackage);
+            PlainClass class_ = new PlainClass(qualifiedClassName);
             ClassAst classAst = new ClassAst(typeDeclaration, class_);
             asts.add(classAst);
         }
@@ -41,8 +42,4 @@ public class FileAst extends Ast {
         return asts;
     }
 
-    // Only for test
-    public String getProjectPackage() {
-        return projectPackage;
-    }
 }

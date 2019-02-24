@@ -1,22 +1,17 @@
 package me.nettee.depview.model;
 
+import me.nettee.depview.main.Env;
+
 public class PlainClass implements Comparable<PlainClass> {
 
     private final String qualifiedName;
-    private final String projectPackage;
 
-    public PlainClass(PlainClass originClass, String qualifiedName) {
+    public PlainClass(String qualifiedName) {
         this.qualifiedName = qualifiedName;
-        this.projectPackage = originClass.getProjectPackage();
     }
 
-    public PlainClass(String qualifiedName, String projectPackage) {
-        this.qualifiedName = qualifiedName;
-        this.projectPackage = projectPackage;
-    }
-
-    public boolean isInPackage() {
-        return qualifiedName.startsWith(projectPackage);
+    public boolean isInPackage(String packageName) {
+        return qualifiedName.startsWith(packageName);
     }
 
     public String getSimpleName() {
@@ -28,9 +23,17 @@ public class PlainClass implements Comparable<PlainClass> {
         }
     }
 
-    public String getShortName() {
-        int n = projectPackage.length();
-        return qualifiedName.substring(n);
+    private String getShortName(String packageName) {
+        if (qualifiedName.startsWith(packageName)) {
+            int n = packageName.length();
+            return qualifiedName.substring(n);
+        } else {
+            return qualifiedName;
+        }
+    }
+
+    public String getShortName(Env env) {
+        return getShortName(env.getProjectPackage());
     }
 
     public String getName() {
@@ -44,14 +47,6 @@ public class PlainClass implements Comparable<PlainClass> {
         } else {
             return qualifiedName.substring(0, i);
         }
-    }
-
-    public boolean isSamePackageWith(PlainClass that) {
-        return this.getPackage().equals(that.getPackage());
-    }
-
-    public String getProjectPackage() {
-        return projectPackage;
     }
 
     @Override
