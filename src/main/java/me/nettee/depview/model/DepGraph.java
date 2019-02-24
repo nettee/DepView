@@ -6,13 +6,14 @@ import me.nettee.depview.main.Env;
 import me.nettee.depview.main.Settings;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class DepGraph {
 
     private final Env env;
-    private final MutableNetwork<PlainClass, DepAttr> depGraph;
+    private MutableNetwork<PlainClass, DepAttr> depGraph;
+    private Map<PlainClass, Integer> classSizes;
     private int allDepCount = 0;
 
     public DepGraph(Env env) {
@@ -21,6 +22,7 @@ public class DepGraph {
                 .allowsParallelEdges(true)
                 .allowsSelfLoops(true)
                 .build();
+        this.classSizes = new HashMap<>();
     }
 
     public void addDep(Dep<? extends DepAttr> invDep) {
@@ -41,6 +43,23 @@ public class DepGraph {
         depGraph.addNode(toClass);
 
         depGraph.addEdge(fromClass, toClass, invDep.getAttr());
+    }
+
+    public void setClassSize(PlainClass class_, int size) {
+        classSizes.put(class_, size);
+    }
+
+    public void santinize() {
+        List<PlainClass> nodesToRemove = new ArrayList<>();
+        for (PlainClass node : depGraph.nodes()) {
+            if (!classSizes.containsKey(node)) {
+                System.out.printf("Warning: invalid node %s, remove it\n", node.toString());
+                nodesToRemove.add(node);
+            }
+        }
+        for (PlainClass node : nodesToRemove) {
+            depGraph.removeNode(node);
+        }
     }
 
     public void printDependencies() {
@@ -90,6 +109,10 @@ public class DepGraph {
 
     public MutableNetwork<PlainClass, DepAttr> getGraph() {
         return depGraph;
+    }
+
+    public Map<PlainClass, Integer> getClassSizes() {
+        return classSizes;
     }
 }
 

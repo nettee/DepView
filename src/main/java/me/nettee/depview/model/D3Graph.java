@@ -3,15 +3,19 @@ package me.nettee.depview.model;
 import com.google.common.graph.MutableNetwork;
 
 import java.util.*;
+import java.util.function.Function;
 
+// This class is for GSON serialization
 public class D3Graph {
 
     class Node {
         private String id;
+        private int radius;
         private int group;
 
-        Node(String id, int group) {
+        Node(String id, int radius, int group) {
             this.id = id;
+            this.radius = radius;
             this.group = group;
         }
     }
@@ -31,7 +35,8 @@ public class D3Graph {
     private List<Node> nodes = new ArrayList<>();
     private List<Link> links = new ArrayList<>();
 
-    private D3Graph(MutableNetwork<PlainClass, DepAttr> depGraph) {
+    private D3Graph(MutableNetwork<PlainClass, DepAttr> depGraph,
+                    Map<PlainClass, Integer> classSizes) {
 
         Set<PlainClass> classes = depGraph.nodes();
 
@@ -50,9 +55,20 @@ public class D3Graph {
             }
         }
 
+        // y = k log x + b
+        final int maxRadius = 16;
+        final int minRadius = 8;
+        final int maxSize = classSizes.values().stream().max(Integer::compareTo).get();
+        final int minSize = classSizes.values().stream().min(Integer::compareTo).get();
+        final double k = (double) (maxRadius - minRadius)
+                / (Math.log(maxSize) - Math.log(minSize));
+        final double b = minRadius - k * Math.log(minSize);
+        Function<Integer, Integer> rad = size -> (int) (k * Math.log(size) + b);
+
         classes.forEach(class_ -> {
+            int radius = rad.apply(classSizes.getOrDefault(class_, minSize));
             int group = packageGroups.get(class_.getPackage());
-            Node node = new Node(class_.getName(), group);
+            Node node = new Node(class_.getName(), radius, group);
             nodes.add(node);
         });
 
@@ -64,6 +80,7 @@ public class D3Graph {
 //                int value = factor * count;
                 int value = depAttrs.size();
                 if (value > 0) {
+                    // Do NOT create links for whose value is zero!
                     Link link = new Link(inClass.getName(), outClass.getName(), value);
                     links.add(link);
                 }
@@ -72,8 +89,7 @@ public class D3Graph {
     }
 
     public static D3Graph fromDepGraph(DepGraph depGraph) {
-        MutableNetwork<PlainClass, DepAttr> graph = depGraph.getGraph();
-        return new D3Graph(graph);
+        return new D3Graph(depGraph.getGraph(), depGraph.getClassSizes());
     }
 }
 

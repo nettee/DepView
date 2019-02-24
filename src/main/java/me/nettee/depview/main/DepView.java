@@ -5,9 +5,10 @@ import com.google.gson.GsonBuilder;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import me.nettee.depview.ast.ASTCreator;
-import me.nettee.depview.ast.FileAst;
 import me.nettee.depview.ast.ClassAstVisitor;
-import me.nettee.depview.model.*;
+import me.nettee.depview.ast.FileAst;
+import me.nettee.depview.model.D3Graph;
+import me.nettee.depview.model.DepGraph;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.*;
@@ -17,7 +18,6 @@ import java.nio.file.StandardCopyOption;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
@@ -68,6 +68,7 @@ public class DepView {
                 });
 
         DepGraph depGraph = env.getDepGraph();
+        depGraph.santinize();
         depGraph.printDependencies();
         printD3Js(depGraph);
 
@@ -92,7 +93,7 @@ public class DepView {
             outputDir.mkdir();
         }
 
-        for (String fileToCopy : new String[] {"index.html", "d3.v4.min.js"}) {
+        for (String fileToCopy : new String[] {"index.html", "d3.v4.min.js", "force-directed.js"}) {
             InputStream inputStream = getClass().getResourceAsStream("/" + fileToCopy);
             File indexFile = new File(outputDir, fileToCopy);
             try {

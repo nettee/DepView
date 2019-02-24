@@ -1,6 +1,7 @@
 package me.nettee.depview.ast;
 
 import me.nettee.depview.main.Env;
+import me.nettee.depview.model.DepGraph;
 import me.nettee.depview.model.PlainClass;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.CompilationUnit;
@@ -35,6 +36,8 @@ public class FileAst extends Ast {
             String qualifiedClassName = String.format("%s.%s", packageName, className);
 
             PlainClass class_ = new PlainClass(qualifiedClassName);
+            env.getDepGraph().setClassSize(class_, typeDeclaration.getLength());
+
             ClassAst classAst = new ClassAst(typeDeclaration, class_);
             asts.add(classAst);
         }
