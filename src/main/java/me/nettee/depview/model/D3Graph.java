@@ -31,7 +31,7 @@ public class D3Graph {
     private List<Node> nodes = new ArrayList<>();
     private List<Link> links = new ArrayList<>();
 
-    private D3Graph(MutableNetwork<PlainClass, Invocation> depGraph) {
+    private D3Graph(MutableNetwork<PlainClass, DepAttr> depGraph) {
 
         Set<PlainClass> classes = depGraph.nodes();
 
@@ -58,11 +58,11 @@ public class D3Graph {
 
         classes.forEach(inClass -> {
             classes.forEach(outClass -> {
-                Set<Invocation> invocations = depGraph.edgesConnecting(inClass, outClass);
+                Set<DepAttr> depAttrs = depGraph.edgesConnecting(inClass, outClass);
 //                int factor = inClass.isSamePackageWith(outClass) ? 3 : 1;
 //                int count = invocations.size() > 3 ? invocations.size() : 0;
 //                int value = factor * count;
-                int value = invocations.size();
+                int value = depAttrs.size();
                 if (value > 0) {
                     Link link = new Link(inClass.getName(), outClass.getName(), value);
                     links.add(link);
@@ -72,7 +72,7 @@ public class D3Graph {
     }
 
     public static D3Graph fromDepGraph(DepGraph depGraph) {
-        MutableNetwork<PlainClass, Invocation> graph = depGraph.getGraph();
+        MutableNetwork<PlainClass, DepAttr> graph = depGraph.getGraph();
         return new D3Graph(graph);
     }
 }

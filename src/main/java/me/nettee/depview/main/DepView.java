@@ -7,9 +7,7 @@ import com.typesafe.config.ConfigFactory;
 import me.nettee.depview.ast.ASTCreator;
 import me.nettee.depview.ast.FileAst;
 import me.nettee.depview.ast.ClassAstVisitor;
-import me.nettee.depview.model.D3Graph;
-import me.nettee.depview.model.DepGraph;
-import me.nettee.depview.model.InvDep;
+import me.nettee.depview.model.*;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.*;
@@ -61,18 +59,15 @@ public class DepView {
 
         ASTCreator astCreator = new ASTCreator(env, sources, jars);
 
-        List<InvDep> invocationDependencies = astCreator.stream()
+        astCreator.stream()
                 .map(FileAst::getClassAsts)
                 .flatMap(Collection::stream)
-                .map(classAst -> {
+                .forEach(classAst -> {
                     ClassAstVisitor visitor = new ClassAstVisitor(env, classAst.getPlainClass());
                     classAst.visitWith(visitor);
-                    return visitor.getInvDeps();
-                })
-                .flatMap(Collection::stream)
-                .collect(Collectors.toList());
+                });
 
-        DepGraph depGraph = new DepGraph(env, invocationDependencies);
+        DepGraph depGraph = env.getDepGraph();
         depGraph.printDependencies();
         printD3Js(depGraph);
 

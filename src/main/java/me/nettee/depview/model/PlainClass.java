@@ -1,6 +1,7 @@
 package me.nettee.depview.model;
 
 import me.nettee.depview.main.Env;
+import org.eclipse.jdt.core.dom.ITypeBinding;
 
 public class PlainClass implements Comparable<PlainClass> {
 
@@ -8,6 +9,10 @@ public class PlainClass implements Comparable<PlainClass> {
 
     public PlainClass(String qualifiedName) {
         this.qualifiedName = qualifiedName;
+    }
+
+    public PlainClass(ITypeBinding typeBinding) {
+        this(typeBinding.getQualifiedName());
     }
 
     public boolean isInPackage(String packageName) {
