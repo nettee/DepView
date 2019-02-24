@@ -5,10 +5,9 @@ import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -20,19 +19,20 @@ public class ASTCreator implements Iterator<FileAst> {
     private final String[] sourcepathEntries;
     private final String projectPackage;
 
-    private List<File> javaFiles;
-    private Iterator<File> iter;
+    private List<Path> javaFiles;
+    private Iterator<Path> iter;
 
-    private String[] fileListToStringArray(List<File> fileList) {
-        return fileList.stream()
-                .map(file -> file.getAbsolutePath())
+    private String[] pathListToStringArray(List<Path> pathList) {
+        return pathList.stream()
+                .map(Path::toAbsolutePath)
+                .map(Path::toString)
                 .collect(Collectors.toList())
-                .toArray(new String[fileList.size()]);
+                .toArray(new String[pathList.size()]);
     }
 
-    public ASTCreator(List<File> sourcePaths, List<File> classPaths, String projectPackage) {
-        sourcepathEntries = fileListToStringArray(sourcePaths);
-        classpathEntries = fileListToStringArray(classPaths);
+    public ASTCreator(List<Path> sourcePaths, List<Path> classPaths, String projectPackage) {
+        this.sourcepathEntries = pathListToStringArray(sourcePaths);
+        this.classpathEntries = pathListToStringArray(classPaths);
         this.projectPackage = projectPackage;
 
         if (Settings.verbose) {
@@ -41,15 +41,15 @@ public class ASTCreator implements Iterator<FileAst> {
         }
 
         javaFiles = new ArrayList<>();
-        for (File sourcePath : sourcePaths) {
+        for (Path sourcePath : sourcePaths) {
             JavaFileFinder finder = JavaFileFinder.find(sourcePath);
             javaFiles.addAll(finder.getJavaFiles());
         }
 
         if (Settings.verbose) {
             System.out.printf("Found %d java files:\n", javaFiles.size());
-            for (File filepath : javaFiles) {
-                System.out.println("\t" + filepath.getPath());
+            for (Path filepath : javaFiles) {
+                System.out.println("\t" + filepath.toString());
             }
         }
 
@@ -61,8 +61,8 @@ public class ASTCreator implements Iterator<FileAst> {
     }
 
     public FileAst next() {
-        File file = iter.next();
-        ASTNode root = createAST(file);
+        Path path = iter.next();
+        ASTNode root = createAST(path);
         return new FileAst(root, projectPackage);
     }
 
@@ -70,15 +70,15 @@ public class ASTCreator implements Iterator<FileAst> {
         throw new UnsupportedOperationException();
     }
 
-    private ASTNode createAST(File file) {
+    private ASTNode createAST(Path path) {
 
-        String filepath = file.getAbsolutePath();
+        String pathString = path.toAbsolutePath().toString();
         String program;
 
         try {
-            program = readFromFile(filepath);
+            program = readFromFile(path);
         } catch (IOException e) {
-            throw new IllegalStateException("Cannot read from file " + filepath);
+            throw new IllegalStateException("Cannot read from file " + pathString);
         }
 
         ASTParser parser = ASTParser.newParser(AST.JLS4);
@@ -88,27 +88,17 @@ public class ASTCreator implements Iterator<FileAst> {
 //        parser.setEnvironment(classpathEntries, sourcepathEntries, null, true);
 //        parser.setEnvironment(null, null, null, true);
         parser.setEnvironment(classpathEntries, sourcepathEntries, null, true);
-        parser.setUnitName(filepath);
+        parser.setUnitName(pathString);
         parser.setResolveBindings(true);
         parser.setBindingsRecovery(true);
 
         return parser.createAST(null);
     }
 
-    private String readFromFile(String path) throws IOException {
-        BufferedReader in = new BufferedReader(new FileReader(path));
-        StringBuilder sb = new StringBuilder();
+    private String readFromFile(Path path) throws IOException {
         String ls = System.getProperty("line.separator");
-        while (true) {
-            String line = in.readLine();
-            if (line == null) {
-                break;
-            }
-            sb.append(line);
-            sb.append(ls);
-        }
-        in.close();
-        return sb.toString();
+        List<String> lines = Files.readAllLines(path);
+        return String.join(ls, lines);
     }
 
 }

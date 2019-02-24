@@ -11,16 +11,17 @@ import me.nettee.depview.ast.InvocationVisitor;
 import me.nettee.depview.model.D3Graph;
 import me.nettee.depview.model.DepGraph;
 import me.nettee.depview.model.InvDep;
-import me.nettee.depview.model.TestSubject;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.*;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.function.Consumer;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 public class DepView {
 
@@ -35,14 +36,16 @@ public class DepView {
         System.out.println("Test subject: " + testSubject.getName());
         String projectPackage = testSubject.getProjectPackage();
 
-        List<File> sources = testSubject.getSources();
-        List<File> classes = testSubject.getClasses();
-        List<File> jars = testSubject.getJars();
+        List<Path> sources = testSubject.getSources();
+        List<Path> classes = testSubject.getClasses();
+        List<Path> jars = testSubject.getJars();
 
         checkNotNull(sources);
         checkNotNull(classes);
+        checkState(!sources.isEmpty());
+        checkState(!classes.isEmpty());
 
-        Consumer<File> filePathPrinter = file -> System.out.println("\t" + file.getPath());
+        Consumer<Path> filePathPrinter = path -> System.out.println("\t" + path.toString());
         System.out.println("Sources:");
         sources.forEach(filePathPrinter);
         System.out.println("Classes:");
@@ -58,17 +61,13 @@ public class DepView {
 
         while (astCreator.hasNext()) {
             FileAst fileAst = astCreator.next();
-            Iterable<ClassAst> classAsts = fileAst.getClassAsts();
-
-            for (ClassAst classAst : classAsts) {
+            for (ClassAst classAst : fileAst.getClassAsts()) {
                 InvocationVisitor visitor = new InvocationVisitor(classAst.getPlainClass());
 
                 classAst.visitWith(visitor);
 
                 List<InvDep> invDeps = visitor.getInvDeps();
-                invDeps.forEach(invDep -> {
-                    depGraph.addDep(invDep);
-                });
+                invDeps.forEach(depGraph::addDep);
             }
         }
 
@@ -109,7 +108,6 @@ public class DepView {
         File dataFile = new File(outputDir, "graph.json");
         try (PrintWriter writer = new PrintWriter(dataFile)) {
             writer.println(json);
-            writer.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }

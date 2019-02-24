@@ -1,9 +1,10 @@
-package me.nettee.depview.model;
+package me.nettee.depview.main;
 
 import com.typesafe.config.Config;
 import org.apache.commons.lang3.tuple.Pair;
 
-import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -11,47 +12,42 @@ public class TestSubject {
 
     private String name;
     private String projectPackage;
-    private List<File> sources;
-    private List<File> classes;
-    private final List<File> jars;
+    private List<Path> sources;
+    private List<Path> classes;
+    private final List<Path> jars;
 
-    public TestSubject() {
+    private TestSubject() {
         jars = new ArrayList<>();
     }
 
-    public static TestSubject fromConfig(Config config) {
+    static TestSubject fromConfig(Config config) {
 
         TestSubject testSubject = new TestSubject();
         testSubject.setName(config.getString("name"));
         testSubject.setProjectPackage(config.getString("package"));
 
         Config path = config.getConfig("path");
-        File projectDir = new File(path.getString("base"));
+        Path projectDir = Paths.get(path.getString("base"));
 
-        List<File> sourcePaths = path.getStringList("sources").stream()
-                .map(pathName -> new File(projectDir, pathName))
-                .collect(Collectors.toList());
-        List<File> classPaths = path.getStringList("classes").stream()
-                .map(pathName -> new File(projectDir, pathName))
-                .collect(Collectors.toList());
+        List<Path> sourcePaths = stringsToPaths(projectDir, path.getStringList("sources"));
+        List<Path> classPaths = stringsToPaths(projectDir, path.getStringList("classes"));
 
         testSubject.setSources(sourcePaths);
         testSubject.setClasses(classPaths);
 
         if (config.hasPath("dependency.jar")) {
-            List<File> jars = config.getStringList("dependency.jar").stream()
-                    .map(jarDependency -> new File(projectDir, jarDependency))
-                    .collect(Collectors.toList());
+            List<Path> jars = stringsToPaths(projectDir, config.getStringList("dependency.jar"));
             testSubject.addJars(jars);
         }
 
+        // Find jar files in file system when constructing TestSubject object.
         if (config.hasPath("dependency.jdk")) {
             Config jdkDependency = config.getConfig("dependency.jdk");
-            File jdkHome = new File(jdkDependency.getString("home"));
+            Path jdkHome = Paths.get(jdkDependency.getString("home"));
 
             List<String> jarDependencies = jdkDependency.getStringList("jar");
-            Pair<Map<String, File>, Set<String>> result = JarsFinder.find(jdkHome, jarDependencies);
-            Map<String, File> jarsFound = result.getLeft();
+            Pair<Map<String, Path>, Set<String>> result = JarsFinder.find(jdkHome, jarDependencies);
+            Map<String, Path> jarsFound = result.getLeft();
             Set<String> jarsNotFound = result.getRight();
 
             if (!jarsNotFound.isEmpty()) {
@@ -63,11 +59,11 @@ public class TestSubject {
 
         if (config.hasPath("dependency.maven")) {
             Config mavenDependency = config.getConfig("dependency.maven");
-            File repository = new File(mavenDependency.getString("repository"));
+            Path repository = Paths.get(mavenDependency.getString("repository"));
 
             List<String> jarDependencies = mavenDependency.getStringList("jar");
-            Pair<Map<String, File>, Set<String>> result = JarsFinder.find(repository, jarDependencies);
-            Map<String, File> jarsFound = result.getLeft();
+            Pair<Map<String, Path>, Set<String>> result = JarsFinder.find(repository, jarDependencies);
+            Map<String, Path> jarsFound = result.getLeft();
             Set<String> jarsNotFound = result.getRight();
 
             if (!jarsNotFound.isEmpty()) {
@@ -80,7 +76,13 @@ public class TestSubject {
         return testSubject;
     }
 
-    public void addJars(Collection<File> jars) {
+    private static List<Path> stringsToPaths(Path projectDir, List<String> strings) {
+        return strings.stream()
+                .map(projectDir::resolve)
+                .collect(Collectors.toList());
+    }
+
+    public void addJars(Collection<Path> jars) {
         this.jars.addAll(jars);
     }
 
@@ -100,23 +102,23 @@ public class TestSubject {
         this.projectPackage = projectPackage;
     }
 
-    public List<File> getSources() {
+    public List<Path> getSources() {
         return sources;
     }
 
-    public void setSources(List<File> sources) {
+    public void setSources(List<Path> sources) {
         this.sources = sources;
     }
 
-    public List<File> getClasses() {
+    public List<Path> getClasses() {
         return classes;
     }
 
-    public void setClasses(List<File> classes) {
+    public void setClasses(List<Path> classes) {
         this.classes = classes;
     }
 
-    public List<File> getJars() {
+    public List<Path> getJars() {
         return jars;
     }
 }

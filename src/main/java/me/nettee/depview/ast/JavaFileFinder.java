@@ -1,41 +1,48 @@
 package me.nettee.depview.ast;
 
-import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 class JavaFileFinder {
 
-    private List<File> javaFiles = new ArrayList<>();
+    private List<Path> javaFiles = new ArrayList<>();
 
-    public static JavaFileFinder find(File dir) {
+    public static JavaFileFinder find(Path dir) {
         return new JavaFileFinder(dir);
     }
 
-    private JavaFileFinder(File dir) {
+    private JavaFileFinder(Path dir) {
         explore(dir);
     }
 
-    // Recursively explore all files under dirPath
-    private void explore(File dir) {
+    // Recursively explore all files under dir
+    private void explore(Path dir) {
 
-        if (!dir.exists()) {
-            throw new IllegalStateException("Illegal Directory Path: " + dir.getAbsolutePath());
+        if (Files.notExists(dir)) {
+            throw new IllegalStateException("Illegal Directory Path: " + dir.toString());
         }
 
-        for (File file : dir.listFiles()) {
-            if (file.isDirectory()) {
-                explore(file);
-            } else {
-                String fileName = file.getName();
-                if (fileName.endsWith(".java")) {
-                    javaFiles.add(file);
+        try (Stream<Path> stream = Files.list(dir)) {
+            stream.forEach(path -> {
+                if (Files.isDirectory(path)) {
+                    explore(path);
+                } else {
+                    String fileName = path.getFileName().toString();
+                    if (fileName.endsWith(".java")) {
+                        javaFiles.add(path);
+                    }
                 }
-            }
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
-    public List<File> getJavaFiles() {
+    public List<Path> getJavaFiles() {
         return javaFiles;
     }
 }
