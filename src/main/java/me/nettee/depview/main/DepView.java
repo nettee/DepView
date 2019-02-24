@@ -5,7 +5,6 @@ import com.google.gson.GsonBuilder;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import me.nettee.depview.ast.ASTCreator;
-import me.nettee.depview.ast.ClassAst;
 import me.nettee.depview.ast.FileAst;
 import me.nettee.depview.ast.InvocationVisitor;
 import me.nettee.depview.model.D3Graph;
@@ -17,8 +16,10 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
@@ -53,24 +54,25 @@ public class DepView {
         System.out.println("Jars:");
         jars.forEach(filePathPrinter);
 
-//        classes.addAll(jars);
+        // Note: classes (e.g. compiled bytecode files) are not used actually.
+        // We only need to pass sources and jars to ASTCreator.
+        // JDT takes jars as classpath entries.
 
         ASTCreator astCreator = new ASTCreator(sources, jars, projectPackage);
 
-        DepGraph depGraph = new DepGraph();
+        List<InvDep> invocationDependencies = astCreator.stream()
+                .map(FileAst::getClassAsts)
+                .flatMap(Collection::stream)
+                .map(classAst -> {
+                    System.out.println("Class AST: " + classAst.getPlainClass().toString());
+                    InvocationVisitor visitor = new InvocationVisitor(classAst.getPlainClass());
+                    classAst.visitWith(visitor);
+                    return visitor.getInvDeps();
+                })
+                .flatMap(Collection::stream)
+                .collect(Collectors.toList());
 
-        while (astCreator.hasNext()) {
-            FileAst fileAst = astCreator.next();
-            for (ClassAst classAst : fileAst.getClassAsts()) {
-                InvocationVisitor visitor = new InvocationVisitor(classAst.getPlainClass());
-
-                classAst.visitWith(visitor);
-
-                List<InvDep> invDeps = visitor.getInvDeps();
-                invDeps.forEach(depGraph::addDep);
-            }
-        }
-
+        DepGraph depGraph = new DepGraph(invocationDependencies);
         depGraph.printDependencies();
         printD3Js(depGraph);
 

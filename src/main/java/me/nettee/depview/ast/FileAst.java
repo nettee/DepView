@@ -1,7 +1,10 @@
 package me.nettee.depview.ast;
 
 import me.nettee.depview.model.PlainClass;
-import org.eclipse.jdt.core.dom.*;
+import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.jdt.core.dom.PackageDeclaration;
+import org.eclipse.jdt.core.dom.TypeDeclaration;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,9 +18,9 @@ public class FileAst extends Ast {
         this.projectPackage = projectPackage;
     }
 
-    public Iterable<ClassAst> getClassAsts() {
+    public List<ClassAst> getClassAsts() {
 
-        List<ClassAst> asts = new ArrayList<ClassAst>();
+        List<ClassAst> asts = new ArrayList<>();
 
         CompilationUnit compilationUnit = (CompilationUnit) root;
 
@@ -38,4 +41,8 @@ public class FileAst extends Ast {
         return asts;
     }
 
+    // Only for test
+    public String getProjectPackage() {
+        return projectPackage;
+    }
 }

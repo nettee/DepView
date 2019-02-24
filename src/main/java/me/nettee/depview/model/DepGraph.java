@@ -5,6 +5,7 @@ import com.google.common.graph.NetworkBuilder;
 import me.nettee.depview.main.Settings;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -18,6 +19,11 @@ public class DepGraph {
                 .allowsParallelEdges(true)
                 .allowsSelfLoops(true)
                 .build();
+    }
+
+    public DepGraph(List<InvDep> depList) {
+        this();
+        depList.forEach(this::addDep);
     }
 
     public void addDep(InvDep invDep) {

@@ -1,5 +1,6 @@
 package me.nettee.depview.ast;
 
+import com.google.common.collect.Streams;
 import me.nettee.depview.main.Settings;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -12,8 +13,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-public class ASTCreator implements Iterator<FileAst> {
+public class ASTCreator {
 
     private final String[] classpathEntries;
     private final String[] sourcepathEntries;
@@ -56,14 +58,24 @@ public class ASTCreator implements Iterator<FileAst> {
         iter = javaFiles.iterator();
     }
 
-    public boolean hasNext() {
-        return iter.hasNext();
+    public Iterator<FileAst> iterator() {
+        return new Iterator<FileAst>() {
+            @Override
+            public boolean hasNext() {
+                return iter.hasNext();
+            }
+
+            @Override
+            public FileAst next() {
+                Path path = iter.next();
+                ASTNode root = createAST(path);
+                return new FileAst(root, projectPackage);
+            }
+        };
     }
 
-    public FileAst next() {
-        Path path = iter.next();
-        ASTNode root = createAST(path);
-        return new FileAst(root, projectPackage);
+    public Stream<FileAst> stream() {
+        return Streams.stream(iterator());
     }
 
     public void remove() {

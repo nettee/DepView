@@ -17,6 +17,7 @@ public class InvocationVisitor extends ASTVisitor {
         this.thisClass = class_;
     }
 
+    // For invocation-dependency, we care only MethodInvocation nodes
     @Override
     public boolean visit(MethodInvocation node) {
         Expression expression = node.getExpression();
