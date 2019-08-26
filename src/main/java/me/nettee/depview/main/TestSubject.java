@@ -2,6 +2,8 @@ package me.nettee.depview.main;
 
 import com.typesafe.config.Config;
 import org.apache.commons.lang3.tuple.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -9,6 +11,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class TestSubject {
+
+    private static final Logger logger = LoggerFactory.getLogger(TestSubject.class);
 
     private String name;
     private String projectPackage;
@@ -51,8 +55,9 @@ public class TestSubject {
             Set<String> jarsNotFound = result.getRight();
 
             if (!jarsNotFound.isEmpty()) {
-                System.out.print("Warning: jars not found: ");
-                jarsNotFound.forEach(fileName -> System.out.println("\t" + fileName));
+                logger.warn("jars not found:\n{}", jarsNotFound.stream()
+                        .map(s -> "\t" + s)
+                        .collect(Collectors.joining("\n")));
             }
             testSubject.addJars(jarsFound.values());
         }
@@ -67,8 +72,9 @@ public class TestSubject {
             Set<String> jarsNotFound = result.getRight();
 
             if (!jarsNotFound.isEmpty()) {
-                System.out.print("Warning: jars not found: ");
-                jarsNotFound.forEach(fileName -> System.out.println("\t" + fileName));
+                logger.warn("jars not found:\n{}", jarsNotFound.stream()
+                        .map(s -> "\t" + s)
+                        .collect(Collectors.joining("\n")));
             }
             testSubject.addJars(jarsFound.values());
         }

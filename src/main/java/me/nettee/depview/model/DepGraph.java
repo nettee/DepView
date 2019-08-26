@@ -3,13 +3,18 @@ package me.nettee.depview.model;
 import com.google.common.graph.MutableNetwork;
 import com.google.common.graph.NetworkBuilder;
 import me.nettee.depview.main.Env;
+import me.nettee.depview.main.Printer;
 import me.nettee.depview.main.Settings;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class DepGraph {
+
+    private static final Logger logger = LoggerFactory.getLogger(DepGraph.class);
 
     private final Env env;
     private MutableNetwork<PlainClass, DepAttr> depGraph;
@@ -53,7 +58,7 @@ public class DepGraph {
         List<PlainClass> nodesToRemove = new ArrayList<>();
         for (PlainClass node : depGraph.nodes()) {
             if (!classSizes.containsKey(node)) {
-                System.out.printf("Warning: invalid node %s, remove it\n", node.toString());
+                logger.warn("invalid node {}, remove it", node.toString());
                 nodesToRemove.add(node);
             }
         }
@@ -68,33 +73,30 @@ public class DepGraph {
         Set<DepAttr> dependencies = depGraph.edges();
 
         if (Settings.verbose) {
-            System.out.printf("All %d classes:\n", classes.size());
-            classes.forEach(class_ -> {
-                if (!class_.isInPackage(env.getProjectPackage())) {
-                    return;
-                }
-                System.out.println("\t" + class_.getShortName(env));
-            });
-            System.out.printf("All %d dependencies:\n", dependencies.size());
+
+            logger.debug("All {} classes:{}", classes.size(), Printer.list(classes.stream()
+                    .filter(class_ -> class_.isInPackage(env.getProjectPackage()))
+                    .map(class_ -> class_.getShortName(env))));
+            logger.debug("All {} dependencies:", dependencies.size());
             classes.forEach(fromClass -> {
                 classes.forEach(toClass -> {
                     Set<DepAttr> depAttrs = depGraph.edgesConnecting(fromClass, toClass);
                     if (depAttrs.isEmpty()) {
                         return;
                     }
-                    System.out.printf("\t%s -> %s\t(%d) {%s}\n",
+                    logger.debug("\t{} -> {}\t({}) {{}}",
                             padTo(fromClass.getShortName(env), 32),
                             padTo(toClass.getShortName(env), 34),
                             depAttrs.size(),
-                            String.join(", ", depAttrs.stream()
+                            depAttrs.stream()
                                     .map(Object::toString)
-                                    .collect(Collectors.toList())));
+                                    .collect(Collectors.joining(", ")));
                 });
             });
         } else {
-            System.out.println("Statistics:");
-            System.out.printf("\t%d project classes\n", classes.size());
-            System.out.printf("\t%d invocation dependencies between project classes (out of %d)\n",
+            logger.info("Statistics:");
+            logger.info("\t{} project classes", classes.size());
+            logger.info("\t{} invocation dependencies between project classes (out of {})",
                     dependencies.size(), allDepCount);
         }
     }

@@ -2,10 +2,13 @@ package me.nettee.depview.ast;
 
 import com.google.common.collect.Streams;
 import me.nettee.depview.main.Env;
+import me.nettee.depview.main.Printer;
 import me.nettee.depview.main.Settings;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -17,6 +20,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class ASTCreator {
+
+    private static final Logger logger = LoggerFactory.getLogger(ASTCreator.class);
 
     private final String[] classpathEntries;
     private final String[] sourcepathEntries;
@@ -38,9 +43,9 @@ public class ASTCreator {
         this.sourcepathEntries = pathListToStringArray(sourcePaths);
         this.classpathEntries = pathListToStringArray(classPaths);
 
+        // TODO verbose 使用 logger 级别代替
         if (Settings.verbose) {
-            System.out.println("classpath entries:");
-            classPaths.forEach(path -> System.out.println("\t" + path));
+            logger.debug(Printer.list("Classpath entries", classPaths));
         }
 
         javaFiles = new ArrayList<>();
@@ -50,10 +55,7 @@ public class ASTCreator {
         }
 
         if (Settings.verbose) {
-            System.out.printf("Found %d java files:\n", javaFiles.size());
-            for (Path filepath : javaFiles) {
-                System.out.println("\t" + filepath.toString());
-            }
+            logger.debug("Found {} java files:\n{}", javaFiles.size(), Printer.list(javaFiles));
         }
 
         iter = javaFiles.iterator();

@@ -3,10 +3,14 @@ package me.nettee.depview.ast;
 import me.nettee.depview.main.Env;
 import me.nettee.depview.model.*;
 import org.eclipse.jdt.core.dom.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
 public class ClassAstVisitor extends ASTVisitor {
+
+    private static final Logger logger = LoggerFactory.getLogger(ClassAstVisitor.class);
 
     private final Env env;
     private final PlainClass thisClass;
@@ -24,12 +28,12 @@ public class ClassAstVisitor extends ASTVisitor {
         depGraph.addDep(dep);
         if (dep.getAttr() instanceof Inheritation) {
             Inheritation inheritation = (Inheritation) dep.getAttr();
-            System.out.printf("%s %s %s\n",
+            logger.info("{} {} {}",
                     dep.getFromClass().getShortName(env),
                     inheritation,
                     dep.getToClass().getShortName(env));
         } else if (dep.getAttr() instanceof Aggregation) {
-            System.out.printf("%s aggregates %s\n",
+            logger.info("{} aggregates {}",
                     dep.getFromClass().getShortName(env),
                     dep.getToClass().getShortName(env));
         }
@@ -44,7 +48,7 @@ public class ClassAstVisitor extends ASTVisitor {
                 PlainClass superClass = new PlainClass(typeBinding);
                 addDep(new Dep<>(thisClass, superClass, Inheritation.classExtends()));
             } else {
-                System.out.printf("Warning: no type binding for superclass %s - in class %s\n",
+                logger.warn("no type binding for superclass {} - in class {}",
                         superclassType.toString(), thisClass.getShortName(env));
             }
         }
@@ -60,7 +64,7 @@ public class ClassAstVisitor extends ASTVisitor {
                             : Inheritation.classImplements();
                     addDep(new Dep<>(thisClass, superClass, inh));
                 } else {
-                    System.out.printf("Warning: no type binding for super interface %s - in class %s\n",
+                    logger.warn("no type binding for super interface {} - in class {}",
                             superInterfaceType.toString(), thisClass.getShortName(env));
                 }
             }
@@ -76,7 +80,7 @@ public class ClassAstVisitor extends ASTVisitor {
             PlainClass fieldClass = new PlainClass(typeBinding);
             addDep(new Dep<>(thisClass, fieldClass, new Aggregation()));
         } else {
-            System.out.printf("Warning: no type binding for field %s - in class %s\n",
+            logger.warn("no type binding for field {} - in class {}",
                     node.toString(), thisClass.getShortName(env));
         }
         return true;
@@ -94,7 +98,7 @@ public class ClassAstVisitor extends ASTVisitor {
                 Invocation invocation = new Invocation(expression.toString(), name.toString());
                 addDep(new Dep<>(thisClass, targetClass, invocation));
             } else {
-                System.out.printf("Warning: no type binding for %s.%s() - in class %s\n",
+                logger.warn("no type binding for {}.{}() - in class {}",
                         expression.toString(), name.toString(), thisClass.getShortName(env));
             }
         }

@@ -2,15 +2,14 @@ package me.nettee.depview.main;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
 import me.nettee.depview.ast.ASTCreator;
 import me.nettee.depview.ast.ClassAstVisitor;
 import me.nettee.depview.ast.FileAst;
 import me.nettee.depview.model.D3Graph;
 import me.nettee.depview.model.DepGraph;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Component;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -18,12 +17,16 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 public class DepView {
+
+    private static final Logger logger = LoggerFactory.getLogger(DepView.class);
 
     private final TestSubject testSubject;
 
@@ -33,7 +36,7 @@ public class DepView {
 
     public void view() {
 
-        System.out.println("Test subject: " + testSubject.getName());
+        logger.info("Test subject: {}", testSubject.getName());
 
         List<Path> sources = testSubject.getSources();
         List<Path> classes = testSubject.getClasses();
@@ -44,13 +47,9 @@ public class DepView {
         checkState(!sources.isEmpty());
         checkState(!classes.isEmpty());
 
-        Consumer<Path> filePathPrinter = path -> System.out.println("\t" + path.toString());
-        System.out.println("Sources:");
-        sources.forEach(filePathPrinter);
-        System.out.println("Classes:");
-        classes.forEach(filePathPrinter);
-        System.out.println("Jars:");
-        jars.forEach(filePathPrinter);
+        logger.info(Printer.list("Sources", sources));
+        logger.info(Printer.list("Classes", classes));
+        logger.info(Printer.list("Jars", jars));
 
         // Note: classes (e.g. compiled bytecode files) are not used actually.
         // We only need to pass sources and jars to ASTCreator.
@@ -73,7 +72,7 @@ public class DepView {
         depGraph.printDependencies();
         printD3Js(depGraph);
 
-        System.out.println("Done.");
+        logger.info("Done.");
     }
 
     private void printD3Js(DepGraph depGraph) {
@@ -111,7 +110,7 @@ public class DepView {
             e.printStackTrace();
         }
 
-        System.out.printf("Dependencies dumped to %s.\n", dataFile.getPath());
-        System.out.printf("Run `%s %s' to view dependencies graph.\n", "bin/serve.py", outputDir.getPath());
+        logger.info("Dependencies dumped to {}.", dataFile.getPath());
+        logger.info("Run `bin/serve.py {}' to view dependencies graph.", outputDir.getPath());
     }
 }
