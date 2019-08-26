@@ -10,6 +10,7 @@ import me.nettee.depview.ast.FileAst;
 import me.nettee.depview.model.D3Graph;
 import me.nettee.depview.model.DepGraph;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Component;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -111,25 +112,6 @@ public class DepView {
         }
 
         System.out.printf("Dependencies dumped to %s.\n", dataFile.getPath());
-        System.out.printf("Run `%s %s' to view dependencies graph.\n", "bin/serve", outputDir.getPath());
+        System.out.printf("Run `%s %s' to view dependencies graph.\n", "bin/serve.py", outputDir.getPath());
     }
-
-    public static void main(String[] args) {
-
-        if (args.length < 1) {
-            throw new IllegalArgumentException();
-        }
-        String filename = args[0];
-
-        File testSubjectConfigFile = new File(filename);
-
-        Config conf = ConfigFactory.parseFile(testSubjectConfigFile);
-        Config config = conf.getConfig("testSubject");
-
-        TestSubject testSubject = TestSubject.fromConfig(config);
-
-        DepView depView = new DepView(testSubject);
-        depView.view();
-    }
-
 }

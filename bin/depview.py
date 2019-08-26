@@ -15,8 +15,7 @@ def depview(args):
     if not targetPath.exists():
         raise RuntimeError("No such directory: {}. Please run `mvn package' first".format(str(targetPath)))
 
-    fs = [f for f in targetPath.iterdir() 
-            if f.is_file() and 'with-dependencies' in f.name]
+    fs = [f for f in targetPath.iterdir() if f.is_file() and f.name.endswith('.jar')]
     if len(fs) == 0:
         raise RuntimeError("No jars found in {}. Please run `mvn package' first".format(str(targetPath)))
 
