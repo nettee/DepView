@@ -13,7 +13,7 @@ public class DepViewRunner implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         if (args.length < 1) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("No config file specified");
         }
         String filename = args[0];
 
