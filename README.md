@@ -13,17 +13,12 @@ Related article: [Depview: Java 程序调用依赖关系的分析与显示](http
 
 ## Quickstart
 
-Build and package project:
-
-```Shell
-mvn package
-```
-
 Write a configuration file for the project that you want to analyze. Follow the examples in `conf-example/` directory.
-Then run DepView:
+
+Build and run DepView:
 
 ```Shell
-bin/depview <CONF_FILE>
+bin/depview.py <CONF_FILE>
 ```
 
 Now the dependencies is in directory `output/<PROJECT_NAME>/`. You can view the dependency graph by running:
