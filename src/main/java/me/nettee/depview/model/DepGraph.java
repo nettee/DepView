@@ -4,7 +4,6 @@ import com.google.common.graph.MutableNetwork;
 import com.google.common.graph.NetworkBuilder;
 import me.nettee.depview.main.Env;
 import me.nettee.depview.main.Printer;
-import me.nettee.depview.main.Settings;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,7 +71,7 @@ public class DepGraph {
         Set<PlainClass> classes = depGraph.nodes();
         Set<DepAttr> dependencies = depGraph.edges();
 
-        if (Settings.verbose) {
+        if (logger.isDebugEnabled()) {
 
             logger.debug("All {} classes:{}", classes.size(), Printer.list(classes.stream()
                     .filter(class_ -> class_.isInPackage(env.getProjectPackage()))

@@ -3,7 +3,6 @@ package me.nettee.depview.ast;
 import com.google.common.collect.Streams;
 import me.nettee.depview.main.Env;
 import me.nettee.depview.main.Printer;
-import me.nettee.depview.main.Settings;
 import me.nettee.depview.utils.FileFinder;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -45,7 +44,7 @@ public class ASTCreator {
         this.classpathEntries = pathListToStringArray(classPaths);
 
         // TODO verbose 使用 logger 级别代替
-        if (Settings.verbose) {
+        if (logger.isDebugEnabled()) {
             logger.debug(Printer.list("Classpath entries", classPaths));
         }
 
@@ -55,7 +54,7 @@ public class ASTCreator {
             this.javaFiles.addAll(javaFiles);
         }
 
-        if (Settings.verbose) {
+        if (logger.isDebugEnabled()) {
             logger.debug("Found {} java files:\n{}", javaFiles.size(), Printer.list(javaFiles));
         }
 
