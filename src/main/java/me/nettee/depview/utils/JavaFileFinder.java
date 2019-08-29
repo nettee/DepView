@@ -1,21 +1,34 @@
-package me.nettee.depview.ast;
+package me.nettee.depview.utils;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-class JavaFileFinder {
+public class JavaFileFinder {
 
-    private List<Path> javaFiles = new ArrayList<>();
+    private List<Path> javaFiles;
+    private final Predicate<Path> pattern;
 
-    public static JavaFileFinder find(Path dir) {
-        return new JavaFileFinder(dir);
+    private static Predicate<Path> isJavaFile = path -> {
+        String fileName = path.getFileName().toString();
+        return fileName.endsWith(".java");
+    };
+
+    public static List<Path> find(Path dir, Predicate<Path> pattern) {
+        return new JavaFileFinder(dir, pattern).javaFiles;
     }
 
-    private JavaFileFinder(Path dir) {
+    public static List<Path> find(Path dir) {
+        return find(dir, isJavaFile);
+    }
+
+    private JavaFileFinder(Path dir, Predicate<Path> pattern) {
+        this.pattern = pattern;
+        this.javaFiles = new ArrayList<>();
         explore(dir);
     }
 
@@ -31,8 +44,7 @@ class JavaFileFinder {
                 if (Files.isDirectory(path)) {
                     explore(path);
                 } else {
-                    String fileName = path.getFileName().toString();
-                    if (fileName.endsWith(".java")) {
+                    if (pattern.test(path)) {
                         javaFiles.add(path);
                     }
                 }
@@ -42,7 +54,4 @@ class JavaFileFinder {
         }
     }
 
-    public List<Path> getJavaFiles() {
-        return javaFiles;
-    }
 }
