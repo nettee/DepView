@@ -4,7 +4,7 @@ import com.google.common.collect.Streams;
 import me.nettee.depview.main.Env;
 import me.nettee.depview.main.Printer;
 import me.nettee.depview.main.Settings;
-import me.nettee.depview.utils.JavaFileFinder;
+import me.nettee.depview.utils.FileFinder;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
@@ -51,7 +51,7 @@ public class ASTCreator {
 
         javaFiles = new ArrayList<>();
         for (Path sourcePath : sourcePaths) {
-            List<Path> javaFiles = JavaFileFinder.find(sourcePath, path -> path.getFileName().toString().endsWith(".java"));
+            List<Path> javaFiles = FileFinder.find(sourcePath, FileFinder.IS_JAVA_FILE);
             this.javaFiles.addAll(javaFiles);
         }
 
