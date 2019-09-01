@@ -53,6 +53,13 @@
       <version>2.8.2</version>
     </dependency>
 
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <version>1.18.8</version>
+      <scope>provided</scope>
+    </dependency>
+
     <!-- Eclipse JDT tool -->
     <dependency>
       <groupId>org.eclipse.core</groupId>
@@ -71,6 +78,7 @@
       <artifactId>config</artifactId>
       <version>1.3.1</version>
     </dependency>
+
 
   </dependencies>
 
