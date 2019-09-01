@@ -1,13 +1,15 @@
 package me.nettee.depview.main;
 
 import com.typesafe.config.Config;
-import org.apache.commons.lang3.tuple.Pair;
+import me.nettee.depview.utils.FileFinder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class TestSubject {
@@ -45,21 +47,14 @@ public class TestSubject {
         }
 
         // Find jar files in file system when constructing TestSubject object.
+        // TODO warn if same dependencies not found
         if (config.hasPath("dependency.jdk")) {
             Config jdkDependency = config.getConfig("dependency.jdk");
             Path jdkHome = Paths.get(jdkDependency.getString("home"));
 
             List<String> jarDependencies = jdkDependency.getStringList("jar");
-            Pair<Map<String, Path>, Set<String>> result = JarsFinder.find(jdkHome, jarDependencies);
-            Map<String, Path> jarsFound = result.getLeft();
-            Set<String> jarsNotFound = result.getRight();
-
-            if (!jarsNotFound.isEmpty()) {
-                logger.warn("jars not found:\n{}", jarsNotFound.stream()
-                        .map(s -> "\t" + s)
-                        .collect(Collectors.joining("\n")));
-            }
-            testSubject.addJars(jarsFound.values());
+            List<Path> jarsFound = FileFinder.find(jdkHome, FileFinder.byFileName(jarDependencies));
+            testSubject.addJars(jarsFound);
         }
 
         if (config.hasPath("dependency.maven")) {
@@ -67,16 +62,9 @@ public class TestSubject {
             Path repository = Paths.get(mavenDependency.getString("repository"));
 
             List<String> jarDependencies = mavenDependency.getStringList("jar");
-            Pair<Map<String, Path>, Set<String>> result = JarsFinder.find(repository, jarDependencies);
-            Map<String, Path> jarsFound = result.getLeft();
-            Set<String> jarsNotFound = result.getRight();
 
-            if (!jarsNotFound.isEmpty()) {
-                logger.warn("jars not found:\n{}", jarsNotFound.stream()
-                        .map(s -> "\t" + s)
-                        .collect(Collectors.joining("\n")));
-            }
-            testSubject.addJars(jarsFound.values());
+            List<Path> jarsFound = FileFinder.find(repository, FileFinder.byFileName(jarDependencies));
+            testSubject.addJars(jarsFound);
         }
 
         return testSubject;

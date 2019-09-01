@@ -3,8 +3,7 @@ package me.nettee.depview.utils;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -14,6 +13,23 @@ public class FileFinder {
         String fileName = path.getFileName().toString();
         return fileName.endsWith(".java");
     };
+
+    public static Predicate<Path> byFileName(Set<String> fileNamesSet) {
+        return path -> {
+            String fileName = path.getFileName().toString();
+            return fileNamesSet.contains(fileName);
+        };
+    }
+
+    public static Predicate<Path> byFileName(List<String> fileNames) {
+        return byFileName(new HashSet<>(fileNames));
+    }
+
+    public static Predicate<Path> byFileName(String[] fileNames) {
+        Set<String> fileNamesSet = new HashSet<>();
+        Collections.addAll(fileNamesSet, fileNames);
+        return byFileName(fileNamesSet);
+    }
 
     public FileFinder() {}
 
