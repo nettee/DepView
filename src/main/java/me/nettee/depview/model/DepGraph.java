@@ -2,6 +2,7 @@ package me.nettee.depview.model;
 
 import com.google.common.graph.MutableNetwork;
 import com.google.common.graph.NetworkBuilder;
+import lombok.Getter;
 import me.nettee.depview.main.Env;
 import me.nettee.depview.main.Printer;
 import org.apache.commons.lang3.StringUtils;
@@ -16,8 +17,12 @@ public class DepGraph {
     private static final Logger logger = LoggerFactory.getLogger(DepGraph.class);
 
     private final Env env;
+
     private MutableNetwork<PlainClass, DepAttr> depGraph;
+
+    @Getter
     private Map<PlainClass, Integer> classSizes;
+
     private int allDepCount = 0;
 
     public DepGraph(Env env) {
@@ -112,8 +117,5 @@ public class DepGraph {
         return depGraph;
     }
 
-    public Map<PlainClass, Integer> getClassSizes() {
-        return classSizes;
-    }
 }
 

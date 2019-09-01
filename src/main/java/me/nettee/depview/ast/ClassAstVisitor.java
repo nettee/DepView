@@ -1,5 +1,6 @@
 package me.nettee.depview.ast;
 
+import lombok.Getter;
 import me.nettee.depview.main.Env;
 import me.nettee.depview.model.*;
 import org.eclipse.jdt.core.dom.*;
@@ -15,7 +16,10 @@ public class ClassAstVisitor extends ASTVisitor {
     private final Env env;
     private final PlainClass thisClass;
 
+    @Getter
     private List<Dep<Invocation>> invDeps = new ArrayList<>();
+
+    @Getter
     private List<Dep<Inheritation>> inhDeps = new ArrayList<>();
 
     public ClassAstVisitor(Env env, PlainClass class_) {
@@ -105,11 +109,4 @@ public class ClassAstVisitor extends ASTVisitor {
         return true;
     }
 
-    public List<Dep<Invocation>> getInvDeps() {
-        return invDeps;
-    }
-
-    public List<Dep<Inheritation>> getInhDeps() {
-        return inhDeps;
-    }
 }

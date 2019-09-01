@@ -1,9 +1,11 @@
 package me.nettee.depview.main;
 
+import lombok.Getter;
 import me.nettee.depview.model.DepGraph;
 
 public class Env {
 
+    @Getter
     private final String projectPackage;
 
     private DepGraph depGraph; // TODO thread safety
@@ -23,7 +25,4 @@ public class Env {
         return depGraph;
     }
 
-    public String getProjectPackage() {
-        return projectPackage;
-    }
 }

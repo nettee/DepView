@@ -20,18 +20,36 @@ public class TestSubject {
 
     private static final Logger logger = LoggerFactory.getLogger(TestSubject.class);
 
+    /**
+     * The name of test subject.
+     */
     @Getter
     @Setter
     private String name;
 
+    /**
+     * Java package name of the project.
+     *
+     * <p>Only classes within this package will be analyzed.
+     */
     @Getter
     @Setter
     private String projectPackage;
 
+    /**
+     * Paths of Java files.
+     *
+     * <p>e.g. {@code src/main/java} for Maven/Gradle projects.
+     */
     @Getter
     @Setter
     private List<Path> sources;
 
+    /**
+     * Paths of bytecode files
+     *
+     * <p>e.g. {@code target/classes} for Maven projects, {@code build/classes} for Gradle projects.
+     */
     @Getter
     @Setter
     private List<Path> classes;
