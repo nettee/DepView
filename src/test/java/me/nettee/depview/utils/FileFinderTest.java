@@ -15,7 +15,7 @@ public class FileFinderTest {
     public void find_javaFile() {
         Path dir = Paths.get("/Users/william/projects/DepView/src/main/java/me/nettee/depview/ast");
 
-        List<Path> paths = FileFinder.find(dir, FileFinder.IS_JAVA_FILE);
+        List<Path> paths = FileFinder.find(dir, FileFinder.byFileExt(".java"));
         assertEquals(5, paths.size());
     }
 

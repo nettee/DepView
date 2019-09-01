@@ -9,10 +9,12 @@ import java.util.stream.Stream;
 
 public class FileFinder {
 
-    public static final Predicate<Path> IS_JAVA_FILE = path -> {
-        String fileName = path.getFileName().toString();
-        return fileName.endsWith(".java");
-    };
+    public static Predicate<Path> byFileExt(String extension) {
+        return path -> {
+            String fileName = path.getFileName().toString();
+            return fileName.endsWith(extension);
+        };
+    }
 
     public static Predicate<Path> byFileName(Set<String> fileNamesSet) {
         return path -> {

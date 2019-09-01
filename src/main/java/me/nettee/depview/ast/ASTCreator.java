@@ -43,14 +43,13 @@ public class ASTCreator {
         this.sourcepathEntries = pathListToStringArray(sourcePaths);
         this.classpathEntries = pathListToStringArray(classPaths);
 
-        // TODO verbose 使用 logger 级别代替
         if (logger.isDebugEnabled()) {
             logger.debug(Printer.list("Classpath entries", classPaths));
         }
 
         javaFiles = new ArrayList<>();
         for (Path sourcePath : sourcePaths) {
-            List<Path> javaFiles = FileFinder.find(sourcePath, FileFinder.IS_JAVA_FILE);
+            List<Path> javaFiles = FileFinder.find(sourcePath, FileFinder.byFileExt(".java"));
             this.javaFiles.addAll(javaFiles);
         }
 
