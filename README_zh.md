@@ -8,6 +8,8 @@
 
 ![依赖图](img/depgraph.png)
 
+在线体验效果： [nettee.io/depview](https://nettee.io/depview/)
+
 ## ✨ 功能
 
 - 可视化 Java 项目中的调用依赖关系

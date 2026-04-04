@@ -8,6 +8,8 @@ If you want to know more about this tool, you can read [my blog post](https://ne
 
 ![Dependency graph](img/depgraph.png)
 
+Try the interactive demo: [nettee.io/depview](https://nettee.io/depview/)
+
 ## ✨ Features
 
 - Visualize calling dependencies in Java projects
