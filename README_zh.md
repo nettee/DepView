@@ -4,11 +4,11 @@
 
 [English](./README.md) | [简体中文](./README_zh.md)
 
-如果你想了解这个工具的更多背景，可以阅读[这篇文章](https://nettee.io/blog/depview-java-code-dependencies-view/)。
-
 ![依赖图](img/depgraph.png)
 
 在线体验效果： [nettee.io/depview](https://nettee.io/depview/)
+
+如果你想了解这个工具的更多背景，可以阅读[这篇文章](https://nettee.io/blog/depview-java-code-dependencies-view/)。
 
 ## ✨ 功能
 

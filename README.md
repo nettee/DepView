@@ -4,11 +4,11 @@ Analyze calling dependencies in Java projects, and visualize them in a dependenc
 
 [English](./README.md) | [简体中文](./README_zh.md)
 
-If you want to know more about this tool, you can read [my blog post](https://nettee.io/blog/depview-java-code-dependencies-view/).
-
 ![Dependency graph](img/depgraph.png)
 
 Try the interactive demo: [nettee.io/depview](https://nettee.io/depview/)
+
+If you want to know more about this tool, you can read [my blog post](https://nettee.io/blog/depview-java-code-dependencies-view/).
 
 ## ✨ Features
 
